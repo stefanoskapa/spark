@@ -14,11 +14,11 @@
 int is_square_attacked(int square, int side) { // attacking side
     int side_offset = side ? 6 : 0;
     //TODO reorder with most probable attacker
-    return (get_knight_attacks(square) & pos_pieces[N + side_offset]) ||
+    return (knight_attacks[square] & pos_pieces[N + side_offset]) ||
            (get_bishop_attacks(square, pos_occupancies[2]) & (pos_pieces[B + side_offset] | pos_pieces[Q + side_offset])) ||
            (get_rook_attacks(square, pos_occupancies[2]) & (pos_pieces[R + side_offset] | pos_pieces[Q + side_offset])) ||
-           (get_pawn_attacks(square, 1 - side) & pos_pieces[P + side_offset]) ||
-           (get_king_attacks(square) & pos_pieces[K + side_offset]);
+           (pawn_attacks[!side][square] & pos_pieces[P + side_offset]) ||
+           (king_attacks[square] & pos_pieces[K + side_offset]);
 
 }
 

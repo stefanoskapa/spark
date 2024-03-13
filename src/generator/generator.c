@@ -30,36 +30,28 @@ int generate_moves(moves *glist) {
 
     switch (piece) {
 
-    case P: // loop over white pawns
+    case P:
       while (bitboard) {
-        // init source square
         source = first_set_bit(bitboard);
         clear_bit(bitboard, source);
+        target = source - 8; 
 
-        // init target square
-        target = source - 8;
-
-        if (target >= a8 &&
-            !(is_set(pos_occupancies[both], target))) { // is target occupied?
-          // pawn promotion
-          if (source < a6) { // pawn on 7th rank
+        if (!(is_set(pos_occupancies[both], target))) { // target not occupied
+          if (source < a6) { // promotion
             add_move(glist, encode_move(P, source, target, Q, 0, 0, 0, 0));
             add_move(glist, encode_move(P, source, target, R, 0, 0, 0, 0));
             add_move(glist, encode_move(P, source, target, B, 0, 0, 0, 0));
             add_move(glist, encode_move(P, source, target, N, 0, 0, 0, 0));
-          } else {
-            add_move(glist, encode_move(P, source, target, 0, 0, 0, 0, 0));
-            if (source > h3 &&
-                !(is_set(pos_occupancies[both], (target - 8)))) { // two squares
-              add_move(glist,
-                       encode_move(P, source, (target - 8), 0, 0, 1, 0, 0));
+          } else { 
+            add_move(glist, encode_move(P, source, target, 0, 0, 0, 0, 0)); // normal move
+            if (source > h3 && !(is_set(pos_occupancies[both], (target - 8)))) { // double push
+              add_move(glist, encode_move(P, source, (target - 8), 0, 0, 1, 0, 0));
             }
           }
         }
 
         // captures
-
-        attacks = get_pawn_attacks(source, pos_side);
+        attacks = pawn_attacks[pos_side][source];
 
         if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
           add_move(glist, encode_move(P, source, pos_ep, 0, 1, 0, 1, 0));
@@ -86,8 +78,7 @@ int generate_moves(moves *glist) {
     case N:
       while (bitboard) {
         source = first_set_bit(bitboard);
-        attacks = get_knight_attacks(source) &
-                  (~pos_occupancies[white]); // don't capture own pieces
+        attacks = knight_attacks[source] & (~pos_occupancies[white]); // don't capture own pieces
 
         while (attacks) { // loop over target squares
           target = first_set_bit(attacks);
@@ -183,7 +174,7 @@ int generate_moves(moves *glist) {
       }
 
       source = first_set_bit(bitboard);
-      attacks = get_king_attacks(source) & (~pos_occupancies[white]);
+      attacks = king_attacks[source] & (~pos_occupancies[white]);
       while (attacks) { // loop over target squares
         target = first_set_bit(attacks);
 
@@ -196,37 +187,28 @@ int generate_moves(moves *glist) {
       }
       break;
 
-    case p: // loop over black pawns
+    case p:
       while (bitboard) {
-        // init source square
         source = first_set_bit(bitboard);
         clear_bit(bitboard, source);
-
-        // init target square
         target = source + 8;
 
-        if (target <= h1 &&
-            !(is_set(pos_occupancies[both], target))) { // is target occupied?
-          // pawn promotion
-          if (source > h3) { // pawn on 7th rank
+        if (!(is_set(pos_occupancies[both], target))) { // target not occupied
+          if (source > h3) { // promotion
             add_move(glist, encode_move(p, source, target, q, 0, 0, 0, 0));
             add_move(glist, encode_move(p, source, target, r, 0, 0, 0, 0));
             add_move(glist, encode_move(p, source, target, b, 0, 0, 0, 0));
             add_move(glist, encode_move(p, source, target, n, 0, 0, 0, 0));
           } else {
-            add_move(glist, encode_move(p, source, target, 0, 0, 0, 0, 0));
-
-            if (source < a6 &&
-                !(is_set(pos_occupancies[both], (target + 8)))) { // two squares
-              add_move(glist,
-                       encode_move(p, source, (target + 8), 0, 0, 1, 0, 0));
+            add_move(glist, encode_move(p, source, target, 0, 0, 0, 0, 0)); // normal move
+            if (source < a6 && !(is_set(pos_occupancies[both], (target + 8)))) { // double push
+              add_move(glist, encode_move(p, source, (target + 8), 0, 0, 1, 0, 0));
             }
           }
         }
 
         // captures
-
-        attacks = get_pawn_attacks(source, pos_side);
+        attacks = pawn_attacks[pos_side][source];
 
         if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
           add_move(glist, encode_move(p, source, pos_ep, 0, 1, 0, 1, 0));
@@ -255,8 +237,7 @@ int generate_moves(moves *glist) {
 
       while (bitboard) {
         source = first_set_bit(bitboard);
-        attacks = get_knight_attacks(source) &
-                  (~pos_occupancies[black]); // don't capture own pieces
+        attacks = knight_attacks[source] & (~pos_occupancies[black]); // don't capture own pieces
         // loop over target squares
         while (attacks) {
           target = first_set_bit(attacks);
@@ -355,7 +336,7 @@ int generate_moves(moves *glist) {
       }
 
       source = first_set_bit(bitboard);
-      attacks = get_king_attacks(source) & (~pos_occupancies[black]);
+      attacks = king_attacks[source] & (~pos_occupancies[black]);
       while (attacks) { // loop over target squares
         target = first_set_bit(attacks);
 

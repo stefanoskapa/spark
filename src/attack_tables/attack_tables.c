@@ -132,8 +132,7 @@ const int rook_relevant_bit_count[64] = {
 };
 
 
-
-U64 get_pawn_attacks(int square, int side) {
+U64 init_pawn_attacks(int square, int side) {
 	U64 bitboard = 0ULL;
   U64 attacks = 0ULL;
   set_bit(bitboard, square);
@@ -145,11 +144,10 @@ U64 get_pawn_attacks(int square, int side) {
   	attacks |= bitboard << 7 & NOT_H;
   	attacks |= bitboard << 9 & NOT_A;
   }
-
 	return attacks;
 }
 
-U64 get_knight_attacks(int square) {
+U64 init_knight_attacks(int square) {
   U64 bitboard = 0ULL;
   U64 attacks = 0ULL;
   set_bit(bitboard, square);
@@ -166,7 +164,8 @@ U64 get_knight_attacks(int square) {
   return attacks;
 }
 
-U64 get_king_attacks(int square) {
+
+U64 init_king_attacks(int square) {
   U64 bitboard = 0ULL;
   U64 attacks = 0ULL;
   set_bit(bitboard, square);
@@ -183,8 +182,6 @@ U64 get_king_attacks(int square) {
   return attacks;
 }
 
-
-//TODO something is wrong with the magics
 U64 get_bishop_attacks(int square, U64 total_occupancy) {
   total_occupancy &= bishop_masks[square];
   total_occupancy *= bishop_magic_numbers[square];
@@ -213,25 +210,24 @@ void init_attack_tables() {
 
   for (int square = 0; square < 64; square++) {
    
-  	pawn_attacks[white][square] = get_pawn_attacks(square, white);
-    pawn_attacks[black][square] = get_pawn_attacks(square, black);
-
-    knight_attacks[square] = get_knight_attacks(square);
-
-    king_attacks[square] = get_king_attacks(square);
+	 //init pawns
+  	pawn_attacks[white][square] = init_pawn_attacks(square, white);
+    pawn_attacks[black][square] = init_pawn_attacks(square, black);
+		//init knights
+    knight_attacks[square] = init_knight_attacks(square);
+		// init kings
+    king_attacks[square] = init_king_attacks(square);
 
 		//init bishops
     bishop_masks[square] = get_bishop_attack_mask(square);
     attack_mask = bishop_masks[square];
     relevant_bits_count = popcnt(attack_mask);
     occupancy_indexes = (1 << relevant_bits_count);
-         
     for (int index = 0; index < occupancy_indexes; index++) {
     	occupancy = get_occupancy_variation(index,attack_mask);
       magic_index = (occupancy * bishop_magic_numbers[square]) >> (64 - bishop_relevant_bit_count[square]);
  			bishop_attacks[square][magic_index] = get_bishop_attack_mask_with_blockers(square,occupancy);
     }
-
 
     //init rooks
     rook_masks[square] = get_rook_attack_mask(square);
