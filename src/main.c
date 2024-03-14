@@ -394,9 +394,9 @@ void takeback() {
 
 // int_stack functions
 
-void push(int_stack *is, int item) { is->items[is->index++] = item; }
+inline void push(int_stack *is, int item) { is->items[is->index++] = item; }
 
-int pop(int_stack *is) {
+inline int pop(int_stack *is) {
   is->index--;
   return is->items[is->index];
 }

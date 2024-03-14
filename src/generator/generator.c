@@ -9,7 +9,26 @@
 #include "generator.h"
 
 void add_move(moves *mlist, int move) {
-  make_move(move);
+ 
+ int piece = get_move_piece(move);
+ int source = get_move_source(move);
+ const U64 sourceBB = 1ULL << source; 
+ 
+ if (piece != K && piece != k) {
+		pos_pieces[piece] &= ~(sourceBB);
+		pos_occupancies[2] &= ~(sourceBB);
+		if (!isKingInCheck(pos_side)) {
+			mlist->moves[mlist->current_index] = move;
+    	mlist->current_index++;		
+		  pos_pieces[piece] |= sourceBB;
+		  pos_occupancies[2] |= sourceBB;
+      return;
+		}
+		pos_pieces[piece] |= sourceBB;
+		pos_occupancies[2] |= sourceBB; 		
+ }
+
+ make_move(move);
   if (!isKingInCheck(!pos_side)) {
     mlist->moves[mlist->current_index] = move;
     mlist->current_index++;
