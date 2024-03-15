@@ -20,19 +20,20 @@ int main() {
   printf("engine started\n");
   init_attack_tables();
 
-  parse_fen(
-      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 "); // initial
+ // parse_fen(
+ //     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 "); // initial
                                                                     // position
 
-  // parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -
-  // "); //position 2 (Kiwipete) parse_fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w -
+//  parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - "); //position 2 (Kiwipete) 
+	//parse_fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w -
   // -  "); //position 3
   // parse_fen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1
   // "); //position 4
-
+  parse_fen("4k3/8/3N4/4K3/8/8/8/8 b - - 0 1");
+  printf("is king in check %d\n", isKingInCheck(pos_side));
   show_board();
 
-  run_perft(6);
+  //run_perft(6);
 
   return 0;
 }

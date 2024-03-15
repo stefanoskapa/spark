@@ -69,6 +69,11 @@ void clean_board() {
 	pos_occupancies[2] = 0ULL;
 
 
+ first_pos_ep = none;
+  pos_moves.index = 0;
+  pos_captured.index = 0;
+  pos_castling_stack.index = 0;
+
 }
 void parse_fen(char *fen_string) {
     if (strlen(fen_string) < 24 || strlen(fen_string) > 80)
