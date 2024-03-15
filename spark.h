@@ -1,73 +1,17 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #define U64 unsigned long long
 
 enum {
-  a8,
-  b8,
-  c8,
-  d8,
-  e8,
-  f8,
-  g8,
-  h8,
-  a7,
-  b7,
-  c7,
-  d7,
-  e7,
-  f7,
-  g7,
-  h7,
-  a6,
-  b6,
-  c6,
-  d6,
-  e6,
-  f6,
-  g6,
-  h6,
-  a5,
-  b5,
-  c5,
-  d5,
-  e5,
-  f5,
-  g5,
-  h5,
-  a4,
-  b4,
-  c4,
-  d4,
-  e4,
-  f4,
-  g4,
-  h4,
-  a3,
-  b3,
-  c3,
-  d3,
-  e3,
-  f3,
-  g3,
-  h3,
-  a2,
-  b2,
-  c2,
-  d2,
-  e2,
-  f2,
-  g2,
-  h2,
-  a1,
-  b1,
-  c1,
-  d1,
-  e1,
-  f1,
-  g1,
-  h1,
+  a8,b8,c8,d8,e8,f8,g8,h8,
+  a7,b7,c7,d7,e7,f7,g7,h7,
+  a6,b6,c6,d6,e6,f6,g6,h6,
+  a5,b5,c5,d5,e5,f5,g5,h5,
+  a4,b4,c4,d4,e4,f4,g4,h4,
+  a3,b3,c3,d3,e3,f3,g3,h3,
+  a2,b2,c2,d2,e2,f2,g2,h2,
+  a1,b1,c1,d1,e1,f1,g1,h1,
   none
 };
 
@@ -109,14 +53,12 @@ extern int first_pos_ep;
 int isKingInCheck(int side);
 void make_move(int move);
 void takeback();
+void show_board();
+void parse_fen(char *fen_string); 
 void push(int_stack *is, int item);
 int pop(int_stack *is);
-U64 perft(int depth);
-void divide(int depth);
-void run_perft(int depth);
 typedef struct {
   int moves[256];
   int current_index;
 } moves;
-U64 perft(int depth);
 #endif

@@ -1,7 +1,7 @@
 #ifndef ATTACK_TABLES_H
 #define ATTACK_TABLES_H
 
-#include "../constants.h"
+#include "../board/board.h"
 #include "../bit_utils/bit_utils.h"
 
 extern U64 king_attacks[64];

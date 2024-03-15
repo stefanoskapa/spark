@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../constants.h"
+#include "../board/board.h"
 #include "bit_utils.h"
 
 void print_bitboard(U64 bitboard) {

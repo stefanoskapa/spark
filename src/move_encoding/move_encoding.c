@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../constants.h"
+#include "../board/board.h"
 #include "move_encoding.h"
 
 void print_move_UCI(int move) {

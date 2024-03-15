@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../constants.h"
+#include "../board/board.h"
 #include "../bit_utils/bit_utils.h"
 #include "attack_tables.h"
 

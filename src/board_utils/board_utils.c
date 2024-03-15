@@ -1,13 +1,11 @@
 
 #include "../attack_tables/attack_tables.h"
 #include "../bit_utils/bit_utils.h"
-#include "../constants.h"
+#include "../board/board.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../constants.h"
 #include "../bit_utils/bit_utils.h"
-#include "../attack_tables/attack_tables.h"
 #include "board_utils.h"
 
 

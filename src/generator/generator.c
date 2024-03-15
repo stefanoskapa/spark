@@ -4,7 +4,7 @@
 #include "../attack_tables/attack_tables.h"
 #include "../bit_utils/bit_utils.h"
 #include "../board_utils/board_utils.h"
-#include "../constants.h"
+#include "../board/board.h"
 #include "../move_encoding/move_encoding.h"
 #include "generator.h"
 
