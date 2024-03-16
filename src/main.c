@@ -32,7 +32,11 @@ int main() {
   parse_fen("4k3/8/3N4/4K3/8/8/8/8 b - - 0 1");
   printf("is king in check %d\n", isKingInCheck(pos_side));
   show_board();
-
+  
+  int move = encode_move(P,e2,e4,0,0,1,0,0);
+  print_move_UCI(move);
+  move = encode_move(P,e7,e8,Q,0,0,0,0);
+  print_move_UCI(move);
   //run_perft(6);
 
   return 0;

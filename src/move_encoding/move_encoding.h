@@ -47,6 +47,7 @@
 #define get_move_ep(move)            ((move & enc_ep))
 #define get_move_castling(move)      ((move & enc_cast))
 
+char* get_move_UCI(int move);
 void print_move_list(moves* move_list);
 void print_move(int move);
 void print_move_UCI(int move);

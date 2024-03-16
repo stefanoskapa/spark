@@ -85,7 +85,8 @@ extern int pos_ep;
 extern int pos_castling;
 extern int first_pos_ep;
 
-
+void print_move_UCI(int move);
+char* get_move_UCI(int move);
 void init_attack_tables();
 int generate_moves(moves *glist); 
 int isKingInCheck(int side);
