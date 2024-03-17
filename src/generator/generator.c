@@ -8,36 +8,53 @@
 #include "../move_encoding/move_encoding.h"
 #include "generator.h"
 
+int nextCapIndex = 0;
+
 void add_move(moves *mlist, int move) {
  
- int piece = get_move_piece(move);
- int source = get_move_source(move);
- const U64 sourceBB = 1ULL << source; 
- 
- if (piece != K && piece != k) {
-		pos_pieces[piece] &= ~(sourceBB);
-		pos_occupancies[2] &= ~(sourceBB);
-		if (!isKingInCheck(pos_side)) {
-			mlist->moves[mlist->current_index] = move;
-    	mlist->current_index++;		
-		  pos_pieces[piece] |= sourceBB;
-		  pos_occupancies[2] |= sourceBB;
-      return;
-		}
-		pos_pieces[piece] |= sourceBB;
-		pos_occupancies[2] |= sourceBB; 		
- }
+  int piece = get_move_piece(move);
+  int source = get_move_source(move);
+  const U64 sourceBB = 1ULL << source; 
+  int index = mlist->current_index;
 
- make_move(move);
+  if (piece != K && piece != k) {
+    pos_pieces[piece] &= ~(sourceBB);
+    pos_occupancies[2] &= ~(sourceBB);
+    if (!isKingInCheck(pos_side)) {
+      if (get_move_capture(move) && nextCapIndex < index ) { //prioritize captures
+        int temp = mlist->moves[nextCapIndex];
+	mlist->moves[nextCapIndex] = move;
+	nextCapIndex++;
+	move = temp; 
+      }
+      mlist->moves[index] = move;
+      mlist->current_index++;		
+      pos_pieces[piece] |= sourceBB;
+      pos_occupancies[2] |= sourceBB;
+      return;
+    }
+    pos_pieces[piece] |= sourceBB;
+    pos_occupancies[2] |= sourceBB; 		
+  } 
+
+  make_move(move);
   if (!isKingInCheck(!pos_side)) {
-    mlist->moves[mlist->current_index] = move;
+     if (get_move_capture(move) && nextCapIndex < index) { //prioritize captures
+        int temp = mlist->moves[nextCapIndex];
+	mlist->moves[nextCapIndex] = move;
+	nextCapIndex++;
+	move = temp; 
+      }
+
+	  
+    mlist->moves[index] = move; //append move at end of list
     mlist->current_index++;
   }
   takeback();
 }
 
 int generate_moves(moves *glist) {
-
+  nextCapIndex = 0;
   int source, target;
   U64 bitboard, attacks;
   int const min = pos_side ? p : P;
