@@ -19,6 +19,7 @@ LIBTARGET := build/spark.a
 all: $(TARGET) $(LIBTARGET)
 
 $(TARGET): $(OBJS) $(MAIN_OBJ)
+	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(MAIN_OBJ)
 
 $(LIBTARGET): $(OBJS)
