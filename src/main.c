@@ -31,14 +31,16 @@ int main() {
   // "); //position 4
   //parse_fen("4k3/8/3N4/4K3/8/8/8/8 b - - 0 1");
   //printf("is king in check %d\n", isKingInCheck(pos_side));
-  show_board();
+  
+  parse_fen("8/8/8/8/1R1Pp1k1/8/8/3K4 b - d3 0 1"); //EP that exposes king to check 
+ show_board();
   moves move_list = {{0}, 0};
   U64 nodes = 0;
 
-//  generate_moves(&move_list);
+ generate_moves(&move_list);
 
-  //print_move_list(&move_list); 
-  run_perft(6);
+  print_move_list(&move_list); 
+  //run_perft(6);
   return 0;
 }
 

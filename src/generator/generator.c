@@ -10,6 +10,14 @@
 
 int nextCapIndex = 0;
 
+/*
+ * A precheck is performed before resorting to
+ * make-unmake: If the piece that is to move
+ * is removed from the board and the moving side is not
+ * in check, then the execution of this move can't 
+ * possibly result in a check. except for EP!
+ *
+ */
 void add_move(moves *mlist, int move) {
  
   int piece = get_move_piece(move);
@@ -17,10 +25,10 @@ void add_move(moves *mlist, int move) {
   const U64 sourceBB = 1ULL << source; 
   int index = mlist->current_index;
 
-  if (piece != K && piece != k) {
+  if (piece != K && piece != k && !get_move_ep(move)) {
     pos_pieces[piece] &= ~(sourceBB);
     pos_occupancies[2] &= ~(sourceBB);
-    if (!isKingInCheck(pos_side)) {
+    if (!isKingInCheck(pos_side)) { //precheck
       if (get_move_capture(move) && nextCapIndex < index ) { //prioritize captures
         int temp = mlist->moves[nextCapIndex];
 	mlist->moves[nextCapIndex] = move;
