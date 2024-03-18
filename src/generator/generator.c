@@ -18,50 +18,39 @@ int nextCapIndex = 0;
  * possibly result in a check. except for EP!
  *
  */
+
+
 void add_move(moves *mlist, int move) {
- 
+
   int piece = get_move_piece(move);
   int source = get_move_source(move);
-  const U64 sourceBB = 1ULL << source; 
-  int index = mlist->current_index;
-
+  const U64 sourceBB = 1ULL << source;
+ 
+  //precheck
   if (piece != K && piece != k && !get_move_ep(move)) {
     pos_pieces[piece] &= ~(sourceBB);
     pos_occupancies[2] &= ~(sourceBB);
-    if (!isKingInCheck(pos_side)) { //precheck
-      if (get_move_capture(move) && nextCapIndex < index ) { //prioritize captures
-        int temp = mlist->moves[nextCapIndex];
-	mlist->moves[nextCapIndex] = move;
-	nextCapIndex++;
-	move = temp; 
-      }
-      mlist->moves[index] = move;
-      mlist->current_index++;		
-      pos_pieces[piece] |= sourceBB;
-      pos_occupancies[2] |= sourceBB;
+    int isInCheck = isKingInCheck(pos_side);
+    pos_pieces[piece] |= sourceBB;
+    pos_occupancies[2] |= sourceBB;
+
+    if (!isInCheck) {
+      mlist->moves[mlist->current_index++] = move;
       return;
     }
-    pos_pieces[piece] |= sourceBB;
-    pos_occupancies[2] |= sourceBB; 		
-  } 
-
-  make_move(move);
-  if (!isKingInCheck(!pos_side)) {
-     if (get_move_capture(move) && nextCapIndex < index) { //prioritize captures
-        int temp = mlist->moves[nextCapIndex];
-	mlist->moves[nextCapIndex] = move;
-	nextCapIndex++;
-	move = temp; 
-      }
-
-	  
-    mlist->moves[index] = move; //append move at end of list
-    mlist->current_index++;
   }
+   
+  // full check
+  make_move(move);
+  if (!isKingInCheck(!pos_side))
+    mlist->moves[mlist->current_index++] = move;
   takeback();
+
 }
 
+
 int generate_moves(moves *glist) {
+      
   nextCapIndex = 0;
   int source, target;
   U64 bitboard, attacks;
