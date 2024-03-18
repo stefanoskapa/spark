@@ -35,7 +35,7 @@ void add_move(moves *mlist, int move) {
     pos_occupancies[2] |= sourceBB;
 
     if (!isInCheck) {
-      mlist->moves[mlist->current_index++] = move;
+      add_prio(mlist, move);
       return;
     }
   }
@@ -43,11 +43,21 @@ void add_move(moves *mlist, int move) {
   // full check
   make_move(move);
   if (!isKingInCheck(!pos_side))
-    mlist->moves[mlist->current_index++] = move;
+    add_prio(mlist, move);
   takeback();
 
 }
 
+void add_prio(moves *mlist, int move) {
+  
+  if (get_move_capture(move) && nextCapIndex < mlist->current_index) {
+    int temp = mlist->moves[nextCapIndex];
+    mlist->moves[nextCapIndex] = move;
+    nextCapIndex++;
+    move = temp; 
+  }
+  mlist->moves[mlist->current_index++] = move;
+}
 
 int generate_moves(moves *glist) {
       
