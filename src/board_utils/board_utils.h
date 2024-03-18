@@ -5,7 +5,7 @@
 #ifndef SPARK_BOARD_UTILS_H
 #define SPARK_BOARD_UTILS_H
 
-
+void show_occ_board();
 int is_square_attacked(int square, int side);
 void show_board();
 void fen_error();

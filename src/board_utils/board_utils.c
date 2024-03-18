@@ -55,21 +55,39 @@ void show_board() {
 
 }
 
+
+void show_occ_board() {
+    for (int square = 0; square < 64; square++) {
+        if (square % 8 == 0)
+            printf("\n");
+        char char_to_show = '.';
+        if (pos_occupancy[square] != INT_MAX) {
+          char_to_show = ascii_pieces[pos_occupancy[square]];
+         }
+    
+        printf(" %c ", char_to_show);
+    }
+
+}
+
+
+
 void fen_error() {
     printf("Invalid FEN string\n");
     exit(1);
 }
 
 void clean_board() {
-	for (size_t i = 0; i < sizeof(pos_pieces)/sizeof(pos_pieces[0]); i++)
-		pos_pieces[i]=0ULL;
-
-	pos_occupancies[0] = 0ULL;
-	pos_occupancies[1] = 0ULL;
-	pos_occupancies[2] = 0ULL;
-
-
- first_pos_ep = none;
+  for (size_t i = 0; i < sizeof(pos_pieces)/sizeof(pos_pieces[0]); i++)
+    pos_pieces[i]=0ULL;
+  
+  for (int i = 0; i < 64; i++)
+    pos_occupancy[i] = INT_MAX;
+  
+  pos_occupancies[0] = 0ULL;
+  pos_occupancies[1] = 0ULL;
+  pos_occupancies[2] = 0ULL;
+  first_pos_ep = none;
   pos_moves.index = 0;
   pos_captured.index = 0;
   pos_castling_stack.index = 0;
@@ -83,7 +101,7 @@ void parse_fen(char *fen_string) {
     int square = 0;
     unsigned char ch;
 
-		clean_board();
+    clean_board();
     // Piece Placement Data
     for (fen_index = 0; fen_index <= 72; fen_index++) {
         ch = fen_string[fen_index];
@@ -93,6 +111,7 @@ void parse_fen(char *fen_string) {
             square += ch - '0';
         } else if (ch != '/') {
             pos_pieces[char_pieces[ch]] |= 1ULL << square;
+	    pos_occupancy[square] = char_pieces[ch];
             pos_occupancies[both] |= 1ULL << square;
             pos_occupancies[ch > 'Z' ? black : white] |= 1ULL << square;
             square++;

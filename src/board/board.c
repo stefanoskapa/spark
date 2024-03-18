@@ -30,6 +30,7 @@
 // board state
 U64 pos_pieces[12];
 U64 pos_occupancies[3]; // 0 = White, 1 = Black, 2 = Both
+int pos_occupancy[64];
 int pos_side = 1;
 int pos_ep = none;
 int pos_castling;
@@ -73,52 +74,52 @@ void make_move(int move) {
   int const target = get_move_target(move);
   U64 const sourceBB = 1ULL << source;
   U64 const targetBB = 1ULL << target;
-  int const min = pos_side ? P : p;
-  int const max = min + 4;
 
   // handle captures: Remove captured piece and adjust castling
   if (get_move_capture(move)) {
     if (get_move_ep(move)) {
       push(&pos_captured, piece == P ? p : P);
+      pos_occupancy[pos_ep + (piece == P ? 8: -8)] = INT_MAX;
       U64 pawn_kill = ~(1ULL << (pos_ep + (piece == P ? 8 : -8)));
       pos_pieces[piece < 6 ? p : P] &= pawn_kill;
       pos_occupancies[piece < 6 ? 1 : 0] &= pawn_kill;
       pos_occupancies[2] &= pawn_kill;
     } else {                              // not ep
-      for (int i = min; i <= max; i++) {  // search for the captured piece
-        if (pos_pieces[i] & (targetBB)) { // found
-
-          if (i == R || i == r) { // rook captured, adjust castling rights
-            switch (target) {
-            case a1:
-              pos_castling &= 13;
-              break;
-            case h1:
-              pos_castling &= 14;
-              break;
-            case a8:
-              pos_castling &= 7;
-              break;
-            case h8:
-              pos_castling &= 11;
-            }
-          }
-
-          pos_pieces[i] &= (~targetBB); // remove captured piece
-          push(&pos_captured, i);       // push captured piece to stack
-          break;
+      int i = pos_occupancy[target];
+      if (i == R || i == r) { // rook captured, adjust castling rights
+        switch (target) {
+          case a1:
+            pos_castling &= 13;
+            break;
+          case h1:
+            pos_castling &= 14;
+            break;
+          case a8:
+            pos_castling &= 7;
+            break;
+          case h8:
+            pos_castling &= 11;
         }
       }
+
+      pos_pieces[i] &= (~targetBB); // remove captured piece
+      push(&pos_captured, i);       // push captured piece to stack
+      pos_occupancy[target] = INT_MAX;				
       pos_occupancies[piece < 6 ? 1 : 0] &= ~targetBB;
     }
   }
 
   // Move piece to target
   pos_pieces[piece] &= (~sourceBB); // remove piece from source
-  if (get_move_promotion(move))     // add piece to target
+  pos_occupancy[source] = INT_MAX;
+  if (get_move_promotion(move)){     // add piece to target
     pos_pieces[get_move_promotion(move)] |= targetBB; // promotion
-  else
+    pos_occupancy[target] = get_move_promotion(move);						      //
+  }
+  else {
     pos_pieces[piece] |= targetBB;
+    pos_occupancy[target] = piece;
+  }
   pos_occupancies[2] &= (~sourceBB);        // remove from total occupancy
   pos_occupancies[2] |= targetBB;           // add to total occupancy
   pos_occupancies[pos_side] &= (~sourceBB); // remove source from my occupancy
@@ -149,33 +150,41 @@ void make_move(int move) {
       switch (target) {
       case g1:
         pos_pieces[R] &= NOT_H1; // remove rook from h1
-        pos_occupancies[0] &= NOT_H1;
+        pos_occupancy[h1] = INT_MAX;
+	pos_occupancies[0] &= NOT_H1;
         pos_occupancies[2] &= NOT_H1;
         pos_pieces[R] |= F1; // place rook on f1
+	pos_occupancy[f1] = R;
         pos_occupancies[0] |= F1;
         pos_occupancies[2] |= F1;
         break;
       case c1:
-        pos_pieces[R] &= NOT_A1; // remove rook from h1
-        pos_occupancies[0] &= NOT_A1;
+        pos_pieces[R] &= NOT_A1; // remove rook from a1
+        pos_occupancy[a1] = INT_MAX;
+	pos_occupancies[0] &= NOT_A1;
         pos_occupancies[2] &= NOT_A1;
-        pos_pieces[R] |= D1; // place rook on f1
+        pos_pieces[R] |= D1; // place rook on d1
+	pos_occupancy[d1] = R; 
         pos_occupancies[0] |= D1;
         pos_occupancies[2] |= D1;
         break;
       case g8:
         pos_pieces[r] &= NOT_H8; // remove rook from h8
+	pos_occupancy[h8] = INT_MAX;
         pos_occupancies[1] &= NOT_H8;
         pos_occupancies[2] &= NOT_H8;
         pos_pieces[r] |= F8; // place rook on f8
+	pos_occupancy[f8] = r;
         pos_occupancies[1] |= F8;
         pos_occupancies[2] |= F8;
         break;
       case c8:
         pos_pieces[r] &= NOT_A8; // remove rook from a8
+	pos_occupancy[a8] = INT_MAX;
         pos_occupancies[1] &= NOT_A8;
         pos_occupancies[2] &= NOT_A8;
         pos_pieces[r] |= D8; // place rook on d8
+	pos_occupancy[d8] = r;
         pos_occupancies[1] |= D8;
         pos_occupancies[2] |= D8;
       }
@@ -202,10 +211,14 @@ void takeback() {
 
   if (pr_piece) {
     pos_pieces[pos_side ? P : p] |= sourceBB; // put pawn back to source
+    pos_occupancy[source] = pos_side ? P : p;
     pos_pieces[pr_piece] &= (~targetBB);      // remove promoted piece
+    pos_occupancy[target] = INT_MAX;
   } else {
     pos_pieces[piece] |= sourceBB;    // put piece back to source
+    pos_occupancy[source] = piece;
     pos_pieces[piece] &= (~targetBB); // remove piece from target
+    pos_occupancy[target] = INT_MAX;
   }
   pos_occupancies[2] |= sourceBB;         // add piece to total occupancy
   pos_occupancies[!pos_side] |= sourceBB; // add piece to its color's occupancy
@@ -218,11 +231,13 @@ void takeback() {
 
     if (!get_move_ep(lmove)) {
       pos_pieces[cap_piece] |= targetBB;
+      pos_occupancy[target] = cap_piece;
       pos_occupancies[2] |= targetBB;
       pos_occupancies[pos_side] |= targetBB;
     } else {
       int ep_target = target + (cap_piece == P ? -8 : +8);
       pos_pieces[cap_piece] |= 1ULL << ep_target;
+      pos_occupancy[ep_target] = cap_piece;
       pos_occupancies[2] |= 1ULL << ep_target;
       pos_occupancies[pos_side] |= 1ULL << ep_target;
     }
@@ -248,7 +263,9 @@ void takeback() {
     switch (target) {
     case g1: // white short
       pos_pieces[R] &= NOT_F1;
+      pos_occupancy[f1] = INT_MAX;
       pos_pieces[R] |= H1;
+      pos_occupancy[h1] = R;
       pos_occupancies[0] &= NOT_F1;
       pos_occupancies[2] &= NOT_F1;
       pos_occupancies[0] |= H1;
@@ -256,7 +273,9 @@ void takeback() {
       break;
     case c1: // white long
       pos_pieces[R] &= NOT_D1;
+      pos_occupancy[d1] = INT_MAX;
       pos_pieces[R] |= A1;
+      pos_occupancy[a1] = R;
       pos_occupancies[0] &= NOT_D1;
       pos_occupancies[2] &= NOT_D1;
       pos_occupancies[0] |= A1;
@@ -264,7 +283,9 @@ void takeback() {
       break;
     case g8: // black short
       pos_pieces[r] &= NOT_F8;
+      pos_occupancy[f8] = INT_MAX;
       pos_pieces[r] |= H8;
+      pos_occupancy[h8] = r;
       pos_occupancies[1] &= NOT_F8;
       pos_occupancies[2] &= NOT_F8;
       pos_occupancies[1] |= H8;
@@ -272,7 +293,9 @@ void takeback() {
       break;
     case c8: // white short
       pos_pieces[r] &= NOT_D8;
+      pos_occupancy[d8] = INT_MAX;
       pos_pieces[r] |= A8;
+      pos_occupancy[a8] = r;
       pos_occupancies[1] &= NOT_D8;
       pos_occupancies[2] &= NOT_D8;
       pos_occupancies[1] |= A8;

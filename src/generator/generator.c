@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-
+#include <limits.h>
 #include "../attack_tables/attack_tables.h"
 #include "../bit_utils/bit_utils.h"
 #include "../board_utils/board_utils.h"
@@ -9,7 +9,13 @@
 #include "generator.h"
 
 int nextCapIndex = 0;
-
+int piece_values[] = {
+  [P] = 1, [p] = 1,
+  [N] = 3, [n] = 3,
+  [B] = 3, [b] = 3,
+  [R] = 5, [r] = 5,
+  [Q] = 9, [q] = 9
+};
 /*
  * A precheck is performed before resorting to
  * make-unmake: If the piece that is to move
@@ -57,6 +63,30 @@ void add_prio(moves *mlist, int move) {
     move = temp; 
   }
   mlist->moves[mlist->current_index++] = move;
+}
+
+//MVV - LVA
+void sort_caps(moves *mlist) { 
+
+  
+  for (int i = 0; i < nextCapIndex; i++) {
+    int best_index = 0;
+    int max = INT_MIN;
+    
+    for (int j = i; j < nextCapIndex; j++) { 
+      int move = mlist->moves[j];
+      int profit = piece_values[pos_occupancy[get_move_target(move)]] - piece_values[get_move_piece(move)];
+      if (get_move_ep(move))
+        profit = 0;
+      if (profit > max) {
+        max = profit;
+	best_index = j;
+      }
+    }
+    int temp = mlist->moves[i];
+    mlist->moves[i] = mlist->moves[best_index];
+    mlist->moves[best_index] = temp;
+  }
 }
 
 int generate_moves(moves *glist) {
@@ -393,7 +423,9 @@ int generate_moves(moves *glist) {
       break;
     }
   }
+  
 
+  sort_caps(glist);
   U64 total = glist->current_index;
   return total;
 }

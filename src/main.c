@@ -21,17 +21,7 @@ struct perf_test {
   int d_count;
 };
 
-int main() {
-
-  printf("engine started\n\n");
-  init_attack_tables();
-
-  perft_suite(4);
-  return 0;
-}
-
-void perft_suite(int max_depth) {
-  struct perf_test pos_list[] = { // results taken from chessprogramming.org/Perft_Results
+struct perf_test pos_list[] = { // results taken from chessprogramming.org/Perft_Results
     {
       "Position 1", 
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -64,6 +54,25 @@ void perft_suite(int max_depth) {
     }
   };
 
+
+
+int main() {
+
+  printf("engine started\n\n");
+  init_attack_tables();
+  
+  //parse_fen(pos_list[1].pos);
+  //show_board(); 
+  //moves list = {{0},0};
+  //generate_moves(&list);
+  //print_move_list(&list);
+  
+  perft_suite(4);
+  return 0;
+}
+
+void perft_suite(int max_depth) {
+  
  
   int pos_count = sizeof(pos_list) / sizeof(pos_list[0]);
   for (int i = 0; i < pos_count; i++) {
