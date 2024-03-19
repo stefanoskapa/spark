@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 
 #define NOT_H1 ~(1ULL << h1)
 #define F1 1ULL << f1

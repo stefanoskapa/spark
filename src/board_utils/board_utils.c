@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "../bit_utils/bit_utils.h"
 #include "board_utils.h"
 
