@@ -61,13 +61,7 @@ int main() {
   printf("engine started\n\n");
   init_attack_tables();
   
-  //parse_fen(pos_list[1].pos);
-  //show_board(); 
-  //moves list = {{0},0};
-  //generate_moves(&list);
-  //print_move_list(&list);
-  
-  perft_suite(4);
+  perft_suite(5);
   return 0;
 }
 
