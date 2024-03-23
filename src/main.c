@@ -61,7 +61,7 @@ int main() {
   printf("engine started\n\n");
   init_attack_tables();
   
-  perft_suite(5);
+  perft_suite(4);
   return 0;
 }
 

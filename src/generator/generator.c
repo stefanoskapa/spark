@@ -8,6 +8,9 @@
 #include "../move_encoding/move_encoding.h"
 #include "generator.h"
 
+static inline void add_prio(moves *mlist, int move);
+static inline void sort_caps(moves *mlist);
+
 int nextCapIndex = 0;
 int piece_values[] = {
   [P] = 1, [p] = 1,
@@ -15,8 +18,7 @@ int piece_values[] = {
   [B] = 3, [b] = 3,
   [R] = 5, [r] = 5,
   [Q] = 9, [q] = 9,
-  [K] = 999, [k] = 999,
-  [0xFF] = 0
+  [K] = 999, [k] = 999
 };
 /*
  * A precheck is performed before resorting to
@@ -24,24 +26,22 @@ int piece_values[] = {
  * is removed from the board and the moving side is not
  * in check, then the execution of this move can't 
  * possibly result in a check. Exceptions: king moves and EP!
+ * This is to avoid make/unmake whenever possible, as those
+ * are expensive operations.
  *
  */
-
-
 void add_move(moves *mlist, int move) {
 
   int piece = get_move_piece(move);
-  int source = get_move_source(move);
-  const U64 sourceBB = 1ULL << source;
 
   //precheck
   if (piece != K && piece != k && !get_move_ep(move)) {
+    const U64 sourceBB = 1ULL << get_move_source(move);
     pos_pieces[piece] &= ~(sourceBB);
     pos_occupancies[2] &= ~(sourceBB);
     int isInCheck = isKingInCheck(pos_side);
     pos_pieces[piece] |= sourceBB;
     pos_occupancies[2] |= sourceBB;
-
     if (!isInCheck) {
       add_prio(mlist, move);
       return;
@@ -53,10 +53,9 @@ void add_move(moves *mlist, int move) {
   if (!isKingInCheck(!pos_side))
     add_prio(mlist, move);
   takeback();
-
 }
 
-void add_prio(moves *mlist, int move) {
+static inline void add_prio(moves *mlist, int move) {
 
   if (get_move_capture(move)) {
     if (nextCapIndex < mlist->current_index) {
@@ -70,7 +69,7 @@ void add_prio(moves *mlist, int move) {
 }
 
 //MVV - LVA
-void sort_caps(moves *mlist) { 
+static inline void sort_caps(moves *mlist) { 
 
 
   for (int i = 0; i < nextCapIndex; i++) {

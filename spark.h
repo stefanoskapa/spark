@@ -1,5 +1,5 @@
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef SPARK_H
+#define SPARK_H
 
 #define U64 unsigned long long
 #define enc_piece 		0xF
@@ -14,10 +14,10 @@
 
 #define encode_move(piece, source, target, prom_piece, capture, double_push, ep, castling) \
   (piece) 					  |\
-	(source << 4) 		  |\
-	(target << 10) 		  |\
-	(prom_piece << 16)  |\
-	(capture << 20)     |\
+  (source << 4) 		  |\
+  (target << 10) 		  |\
+  (prom_piece << 16)  |\
+  (capture << 20)     |\
   (double_push << 21) |\
   (ep << 22) 					|\
   (castling << 23)
