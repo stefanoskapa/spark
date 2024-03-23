@@ -98,4 +98,5 @@ void print_bitboard(U64 bitboard);
 void parse_fen(char *fen_string); 
 void push(int_stack *is, int item);
 int pop(int_stack *is);
+U64 get_queen_attacks(int square, U64 total_occupancy);
 #endif

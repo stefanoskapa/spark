@@ -13,7 +13,7 @@ void init_attack_tables();
 //U64 get_king_attacks(int square);
 U64 get_bishop_attacks(int square, U64 total_occupancy);
 U64 get_rook_attacks(int square, U64 total_occupancy);
-U64 get_queen_attacks(int square, U64 total_occupancy);
+extern U64 get_queen_attacks(int square, U64 total_occupancy);
 U64 get_occupancy_variation(int index, U64 attack_mask);
 U64 init_king_attacks(int square);
 U64 init_knight_attacks(int square);
