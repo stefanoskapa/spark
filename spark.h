@@ -80,6 +80,7 @@ extern int promoted_pieces[];
 extern char *square_to_coordinates[];
 extern U64 pos_pieces[12];
 extern U64 pos_occupancies[3];
+extern int pos_occupancy[64];
 extern int pos_side;
 extern int pos_ep;
 extern int pos_castling;
