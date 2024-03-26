@@ -10,7 +10,7 @@
 #define enc_double    0x200000
 #define enc_ep        0x400000
 #define enc_cast      0x800000
-
+#define enc_check     0x1000000
 
 #define encode_move(piece, source, target, prom_piece, capture, double_push, ep, castling) \
   (piece) 					  |\
@@ -31,7 +31,7 @@
 #define get_move_double(move)        ((move & enc_double))
 #define get_move_ep(move)            ((move & enc_ep))
 #define get_move_castling(move)      ((move & enc_cast))
-
+#define get_move_check(move)         ((move & enc_check))
 
 enum {
   a8,b8,c8,d8,e8,f8,g8,h8,
