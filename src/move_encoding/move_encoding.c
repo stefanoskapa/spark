@@ -39,8 +39,9 @@ void print_move(int move) {
   printf("Capture:...........%s\n", get_move_capture(move) ? "true" : "false");
   printf("Double Pawn Move:..%s\n", get_move_double(move) ? "true" : "false");	
   printf("En Passant:........%s\n", get_move_ep(move) ? "true" : "false");	
-  printf("Castling:..........%s\n", get_move_castling(move) ? "true" : "false");	
-	printf("------------------------\n\n");
+  printf("Castling:..........%s\n", get_move_castling(move) ? "true" : "false");		
+  printf("Is Check:..........%s\n", get_move_check(move) ? "true" : "false");	
+  printf("------------------------\n\n");
 
 
 }

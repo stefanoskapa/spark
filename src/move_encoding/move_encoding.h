@@ -8,8 +8,9 @@
 	0000 0000 0001 0000 0000 0000 0000 0000   capture flag
 	0000 0000 0010 0000 0000 0000 0000 0000   double pawn push flag
 	0000 0000 0100 0000 0000 0000 0000 0000   en passant flag
-	0000 0000 1000 0000 0000 0000 0000 0000   castling flag
-  1111 1111 0000 0000 0000 0000 0000 0000   reserved
+	0000 0000 1000 0000 0000 0000 0000 0000   castling flag 
+  0000 0001 0000 0000 0000 0000 0000 0000   is check
+  1111 1110 0000 0000 0000 0000 0000 0000   reserved
 
 */
 
@@ -25,7 +26,7 @@
 #define enc_double    0x200000
 #define enc_ep        0x400000
 #define enc_cast      0x800000
-
+#define enc_check     0x1000000
 
 #define encode_move(piece, source, target, prom_piece, capture, double_push, ep, castling) \
   (piece) 					  |\
@@ -46,7 +47,9 @@
 #define get_move_double(move)        ((move & enc_double))
 #define get_move_ep(move)            ((move & enc_ep))
 #define get_move_castling(move)      ((move & enc_cast))
+#define get_move_check(move)         ((move & enc_check))
 
+#define set_move_check(move)         ((move | enc_check))
 char* get_move_UCI(int move);
 void print_move_list(moves* move_list);
 void print_move(int move);
