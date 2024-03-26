@@ -60,9 +60,16 @@ int main() {
 
   printf("engine started\n\n");
   init_attack_tables();
-  
+  benchmark();  
   perft_suite(4);
   return 0;
+}
+
+
+  
+void benchmark() {
+  parse_fen(pos_list[1].pos);
+  run_perft(5);
 }
 
 void perft_suite(int max_depth) {

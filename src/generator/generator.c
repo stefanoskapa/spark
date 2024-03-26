@@ -32,7 +32,7 @@ int piece_values[] = {
  */
 void add_move(moves *mlist, int move) {
 
-  int piece = get_move_piece(move);
+//  int piece = get_move_piece(move);
 /*
   //precheck
   if (piece != K && piece != k && !get_move_ep(move)) {
