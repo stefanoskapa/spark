@@ -396,59 +396,43 @@ void takeback() {
 
 void fast_make(int move) {
 
-  int const piece = get_move_piece(move);
-  int const source = get_move_source(move);
-  int const target = get_move_target(move);
+  U64 const sourceBB = 1ULL << get_move_source(move);
+  U64 const targetBB = 1ULL << get_move_target(move);
+
+  if (get_move_ep(move)) {
+    if (pos_side == white) 
+      pos_occupancies[2] &= ~(1ULL << (pos_ep + 8)); // remove captured pawn
+    else
+      pos_occupancies[2] &= ~(1ULL << (pos_ep - 8)); // remove captured pawn
+  }
+    pos_occupancies[2] &= (~sourceBB); // remove source from total occupancy
+    pos_occupancies[2] |= targetBB;    // add target to total occupancy
+
+  push(&pos_moves, move); // push new move
+}
+
+void fast_unmake() {
+
+  int lmove = pop(&pos_moves);
+
+  int const source = get_move_source(lmove);
+  int const target = get_move_target(lmove);
   U64 const sourceBB = 1ULL << source;
   U64 const targetBB = 1ULL << target;
 
-  if (pos_side == white) {
-    if (get_move_capture(move)) {
-      if (get_move_ep(move)) {
-        push(&pos_captured, p);
-        U64 pawn_kill = ~(1ULL << (pos_ep + 8));
-        pos_pieces[p] &= pawn_kill;
-        pos_occupancies[2] &= pawn_kill;
-      } else {                              // not ep
-        int dead_piece = pos_occupancy[target];
-        pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
-        push(&pos_captured, dead_piece);       // push captured piece to stack
-      }
+  pos_occupancies[2] |= sourceBB;         // add piece's source to total occupancy
+  pos_occupancies[2] &= (~targetBB);      // remove piece's target from total occupancy
+
+  if (get_move_capture(lmove)) { // restore captured piece
+
+    if (get_move_ep(lmove)) {
+      int ep_target = target + (pos_side == black ? -8 : +8);
+      pos_occupancies[2] |= 1ULL << ep_target; // add ep-captured pawn to total occupancy
+    } else {
+      pos_occupancies[2] |= targetBB; // add captured piece to total occupancy
     }
-
-    // Move piece to target
-    pos_pieces[piece] &= (~sourceBB); // remove piece from source
-    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
-    
-    pos_pieces[piece] |= targetBB; // add piece to bitboard
-    pos_occupancies[2] |= targetBB;           // add target to total occupancy
-
-  } else { //black
-    if (get_move_capture(move)) {
-      if (get_move_ep(move)) {
-        push(&pos_captured, P);
-        U64 pawn_kill = ~(1ULL << (pos_ep - 8));
-        pos_pieces[P] &= pawn_kill;
-        pos_occupancies[2] &= pawn_kill;
-      } else {                              // not ep
-        int dead_piece = pos_occupancy[target];
-        pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
-        push(&pos_captured, dead_piece);       // push captured piece to stack
-      }
-    }
-
-    // Move piece to target
-    pos_pieces[piece] &= (~sourceBB); // remove piece from source
-    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
-    
-    pos_pieces[piece] |= targetBB; // add piece to bitboard
-    pos_occupancies[2] |= targetBB;           // add target to total occupancy
-
   }
 
-
-  push(&pos_moves, move); // push new move
-  pos_side = !(pos_side); // change turns
 }
 
 

@@ -48,14 +48,19 @@ void add_move(moves *mlist, int move) {
     }
   }
 
-  // full check
+ // full check
   make_move(move);
-  //fast_make(move);
   if (!isKingInCheck(!pos_side)) { //legal move
     add_prio(mlist, move);
   }
-  //fast_unmake();
   takeback();
+
+ // fast_make(move);
+ // if (!isKingInCheck(pos_side)) { //legal move
+ //   add_prio(mlist, move);
+ // }
+ // fast_unmake();
+
 }
 
 static inline void add_prio(moves *mlist, int move) {
