@@ -57,6 +57,8 @@ extern int_stack pos_moves;
 int isKingInCheck(int side);
 void make_move(int move);
 void takeback();
+void fast_make(int move);
+void fast_unmake();
 void push(int_stack *is, int item);
 int pop(int_stack *is);
 typedef struct {

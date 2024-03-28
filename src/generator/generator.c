@@ -32,8 +32,8 @@ int piece_values[] = {
  */
 void add_move(moves *mlist, int move) {
 
-//  int piece = get_move_piece(move);
-/*
+  int piece = get_move_piece(move);
+
   //precheck
   if (piece != K && piece != k && !get_move_ep(move)) {
     const U64 sourceBB = 1ULL << get_move_source(move);
@@ -47,15 +47,14 @@ void add_move(moves *mlist, int move) {
       return;
     }
   }
-*/
+
   // full check
   make_move(move);
+  //fast_make(move);
   if (!isKingInCheck(!pos_side)) { //legal move
-    if (isKingInCheck(pos_side)) { //flag move as a check
-      move = set_move_check(move);
-    }
     add_prio(mlist, move);
   }
+  //fast_unmake();
   takeback();
 }
 

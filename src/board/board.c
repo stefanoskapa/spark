@@ -76,7 +76,42 @@ void make_move(int move) {
   U64 const sourceBB = 1ULL << source;
   U64 const targetBB = 1ULL << target;
 
-  // handle captures: Remove captured piece and adjust castling
+  
+  /*
+    Branch outline
+
+    
+    if capture 
+      if ep 
+        1. push pawn to capture stack (might not be necessary)
+        2. remove captured pawn from state
+      else
+        1. push captured piece to capture stack
+        2. remove captured piece from state
+     
+    1. remove piece from state
+    
+    if promotion
+      add promoted piece to state
+    else
+      add piece to target
+
+    2. Add target to occupancy
+
+    if R
+      disable castling if rook's source is a1 or h1
+    
+    if K
+      if castling
+        1. castle
+      disable all castling rights  
+
+    if move was double pawn push update pos_ep
+  
+   push new move
+   change turns
+
+  */
   if (pos_side == white) {
     if (get_move_capture(move)) {
       if (get_move_ep(move)) {
@@ -105,6 +140,9 @@ void make_move(int move) {
     // Move piece to target
     pos_pieces[piece] &= (~sourceBB); // remove piece from source
     pos_occupancy[source] = INT_MAX; // remove piece from occupancy array
+    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
+    pos_occupancies[0] &= (~sourceBB); // remove source to white's  occupancy
+    
     if (get_move_promotion(move)){     // promotion
       pos_pieces[get_move_promotion(move)] |= targetBB; // add promoted piece to bitboard
       pos_occupancy[target] = get_move_promotion(move); // add promoted piece to occupancy array
@@ -112,10 +150,10 @@ void make_move(int move) {
       pos_pieces[piece] |= targetBB; // add piece to bitboard
       pos_occupancy[target] = piece; // add piece to occupancy array
     }
-    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
     pos_occupancies[2] |= targetBB;           // add target to total occupancy
-    pos_occupancies[0] &= (~sourceBB); // remove source to white's  occupancy
     pos_occupancies[0] |= targetBB;    // add target to white's  occupancy
+
+    pos_ep = none;
 
     // special cases
     switch (piece) {
@@ -149,9 +187,12 @@ void make_move(int move) {
           }
         }
         pos_castling &= 12; // disable all castling for white
+        break;
+      case P:
+        if (get_move_double(move)) {
+          pos_ep = target + 8;
+        }
     }
-
-    pos_ep = get_move_double(move) ? target + 8 : none;
 
   } else { //black
     if (get_move_capture(move)) {
@@ -181,6 +222,9 @@ void make_move(int move) {
     // Move piece to target
     pos_pieces[piece] &= (~sourceBB); // remove piece from source
     pos_occupancy[source] = INT_MAX; // remove piece from occupancy array
+    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
+    pos_occupancies[1] &= (~sourceBB); // remove source from black's  occupancy
+    
     if (get_move_promotion(move)){     // promotion
       pos_pieces[get_move_promotion(move)] |= targetBB; // add promoted piece to bitboard
       pos_occupancy[target] = get_move_promotion(move); // add promoted piece to occupancy array
@@ -188,11 +232,10 @@ void make_move(int move) {
       pos_pieces[piece] |= targetBB; // add piece to bitboard
       pos_occupancy[target] = piece; // add piece to occupancy array
     }
-    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
     pos_occupancies[2] |= targetBB;           // add target to total occupancy
-    pos_occupancies[1] &= (~sourceBB); // remove source from black's  occupancy
     pos_occupancies[1] |= targetBB;    // add target to black's  occupancy
 
+    pos_ep = none;
     // special cases
     switch (piece) {
       case r:
@@ -225,9 +268,12 @@ void make_move(int move) {
           }
         } 
         pos_castling &= 3; // disable all castling for black
-
+        break;
+      case p:
+        if (get_move_double(move)) {
+          pos_ep = target - 8;
+        }
     }
-    pos_ep = get_move_double(move) ? target - 8 : none;
 
   }
 
@@ -345,6 +391,66 @@ void takeback() {
   pos_castling = pop(&pos_castling_stack); // restore last castling state
   pos_side = !pos_side;                    // change turn
 }
+
+
+
+void fast_make(int move) {
+
+  int const piece = get_move_piece(move);
+  int const source = get_move_source(move);
+  int const target = get_move_target(move);
+  U64 const sourceBB = 1ULL << source;
+  U64 const targetBB = 1ULL << target;
+
+  if (pos_side == white) {
+    if (get_move_capture(move)) {
+      if (get_move_ep(move)) {
+        push(&pos_captured, p);
+        U64 pawn_kill = ~(1ULL << (pos_ep + 8));
+        pos_pieces[p] &= pawn_kill;
+        pos_occupancies[2] &= pawn_kill;
+      } else {                              // not ep
+        int dead_piece = pos_occupancy[target];
+        pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
+        push(&pos_captured, dead_piece);       // push captured piece to stack
+      }
+    }
+
+    // Move piece to target
+    pos_pieces[piece] &= (~sourceBB); // remove piece from source
+    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
+    
+    pos_pieces[piece] |= targetBB; // add piece to bitboard
+    pos_occupancies[2] |= targetBB;           // add target to total occupancy
+
+  } else { //black
+    if (get_move_capture(move)) {
+      if (get_move_ep(move)) {
+        push(&pos_captured, P);
+        U64 pawn_kill = ~(1ULL << (pos_ep - 8));
+        pos_pieces[P] &= pawn_kill;
+        pos_occupancies[2] &= pawn_kill;
+      } else {                              // not ep
+        int dead_piece = pos_occupancy[target];
+        pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
+        push(&pos_captured, dead_piece);       // push captured piece to stack
+      }
+    }
+
+    // Move piece to target
+    pos_pieces[piece] &= (~sourceBB); // remove piece from source
+    pos_occupancies[2] &= (~sourceBB);        // remove source from total occupancy
+    
+    pos_pieces[piece] |= targetBB; // add piece to bitboard
+    pos_occupancies[2] |= targetBB;           // add target to total occupancy
+
+  }
+
+
+  push(&pos_moves, move); // push new move
+  pos_side = !(pos_side); // change turns
+}
+
 
 // int_stack functions
 

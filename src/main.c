@@ -68,8 +68,8 @@ int main() {
 
   
 void benchmark() {
-  parse_fen(pos_list[1].pos);
-  run_perft(5);
+  parse_fen(pos_list[0].pos);
+  run_perft(6);
 }
 
 void perft_suite(int max_depth) {

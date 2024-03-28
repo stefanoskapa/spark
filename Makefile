@@ -1,6 +1,6 @@
 # Compiler and Flags
 CC := gcc
-CFLAGS := -O3 -g -Wall -Wextra -pedantic -std=c11
+CFLAGS := -Ofast -g -Wall -Wextra -pedantic -std=c11
 
 # Source and Object Files
 
