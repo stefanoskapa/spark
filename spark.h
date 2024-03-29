@@ -89,7 +89,7 @@ extern int first_pos_ep;
 void print_move_UCI(int move);
 char* get_move_UCI(int move);
 void init_attack_tables();
-int generate_moves(moves *glist); 
+moves* generate_moves(); 
 int isKingInCheck(int side);
 void make_move(int move);
 void takeback();

@@ -10,6 +10,7 @@
 
 static inline void add_prio(moves *mlist, int move);
 static inline void sort_caps(moves *mlist);
+static inline void add_move(moves *mlist, int move);
 
 int nextCapIndex = 0;
 int piece_values[] = {
@@ -30,7 +31,7 @@ int piece_values[] = {
  * are expensive operations.
  *
  */
-void add_move(moves *mlist, int move) {
+static inline void add_move(moves *mlist, int move) {
 
   int piece = get_move_piece(move);
 
@@ -99,7 +100,9 @@ static inline void sort_caps(moves *mlist) {
 
 
 
-int generate_moves(moves *glist) {
+moves* generate_moves() {
+  static moves glist;
+  glist.current_index = 0;
 
   nextCapIndex = 0;
   int source, target;
@@ -121,14 +124,14 @@ int generate_moves(moves *glist) {
 
           if (!(is_set(pos_occupancies[both], target))) { // target not occupied
             if (source < a6) { // promotion
-              add_move(glist, encode_move(P, source, target, Q, 0, 0, 0, 0));
-              add_move(glist, encode_move(P, source, target, R, 0, 0, 0, 0));
-              add_move(glist, encode_move(P, source, target, B, 0, 0, 0, 0));
-              add_move(glist, encode_move(P, source, target, N, 0, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, Q, 0, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, R, 0, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, B, 0, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, N, 0, 0, 0, 0));
             } else { 
-              add_move(glist, encode_move(P, source, target, 0, 0, 0, 0, 0)); // normal move
+              add_move(&glist, encode_move(P, source, target, 0, 0, 0, 0, 0)); // normal move
               if (source > h3 && !(is_set(pos_occupancies[both], (target - 8)))) { // double push
-                add_move(glist, encode_move(P, source, (target - 8), 0, 0, 1, 0, 0));
+                add_move(&glist, encode_move(P, source, (target - 8), 0, 0, 1, 0, 0));
               }
             }
           }
@@ -137,7 +140,7 @@ int generate_moves(moves *glist) {
           attacks = pawn_attacks[pos_side][source];
 
           if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
-            add_move(glist, encode_move(P, source, pos_ep, 0, 1, 0, 1, 0));
+            add_move(&glist, encode_move(P, source, pos_ep, 0, 1, 0, 1, 0));
             clear_bit(attacks, pos_ep);
           }
 
@@ -146,12 +149,12 @@ int generate_moves(moves *glist) {
           while (attacks) {
             target = first_set_bit(attacks);
             if (source < a6) { // capture and promotion
-              add_move(glist, encode_move(P, source, target, Q, 1, 0, 0, 0));
-              add_move(glist, encode_move(P, source, target, R, 1, 0, 0, 0));
-              add_move(glist, encode_move(P, source, target, B, 1, 0, 0, 0));
-              add_move(glist, encode_move(P, source, target, N, 1, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, Q, 1, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, R, 1, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, B, 1, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, N, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(P, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(P, source, target, 0, 1, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -167,9 +170,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[black], target)) {
-              add_move(glist, encode_move(N, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(N, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(N, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(N, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -186,9 +189,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[black], target)) {
-              add_move(glist, encode_move(B, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(B, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(B, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(B, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -206,9 +209,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[black], target)) {
-              add_move(glist, encode_move(R, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(R, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(R, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(R, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -225,9 +228,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[black], target)) {
-              add_move(glist, encode_move(Q, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(Q, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(Q, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(Q, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -241,7 +244,7 @@ int generate_moves(moves *glist) {
                                                  // make sure e1 and f1 are not under attack
             if (!is_square_attacked(e1, black) &&
                 !is_square_attacked(f1, black)) {
-              add_move(glist, encode_move(K, e1, g1, 0, 0, 0, 0, 1));
+              add_move(&glist, encode_move(K, e1, g1, 0, 0, 0, 0, 1));
             }
           }
         }
@@ -251,7 +254,7 @@ int generate_moves(moves *glist) {
                                                    // make sure e1 and d1 are not under attack
             if (!is_square_attacked(e1, black) &&
                 !is_square_attacked(d1, black)) {
-              add_move(glist, encode_move(K, e1, c1, 0, 0, 0, 0, 1));
+              add_move(&glist, encode_move(K, e1, c1, 0, 0, 0, 0, 1));
             }
           }
         }
@@ -262,9 +265,9 @@ int generate_moves(moves *glist) {
           target = first_set_bit(attacks);
 
           if (is_set(pos_occupancies[black], target)) {
-            add_move(glist, encode_move(K, source, target, 0, 1, 0, 0, 0));
+            add_move(&glist, encode_move(K, source, target, 0, 1, 0, 0, 0));
           } else {
-            add_move(glist, encode_move(K, source, target, 0, 0, 0, 0, 0));
+            add_move(&glist, encode_move(K, source, target, 0, 0, 0, 0, 0));
           }
           clear_bit(attacks, target);
         }
@@ -278,14 +281,14 @@ int generate_moves(moves *glist) {
 
           if (!(is_set(pos_occupancies[both], target))) { // target not occupied
             if (source > h3) { // promotion
-              add_move(glist, encode_move(p, source, target, q, 0, 0, 0, 0));
-              add_move(glist, encode_move(p, source, target, r, 0, 0, 0, 0));
-              add_move(glist, encode_move(p, source, target, b, 0, 0, 0, 0));
-              add_move(glist, encode_move(p, source, target, n, 0, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, q, 0, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, r, 0, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, b, 0, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, n, 0, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(p, source, target, 0, 0, 0, 0, 0)); // normal move
+              add_move(&glist, encode_move(p, source, target, 0, 0, 0, 0, 0)); // normal move
               if (source < a6 && !(is_set(pos_occupancies[both], (target + 8)))) { // double push
-                add_move(glist, encode_move(p, source, (target + 8), 0, 0, 1, 0, 0));
+                add_move(&glist, encode_move(p, source, (target + 8), 0, 0, 1, 0, 0));
               }
             }
           }
@@ -294,7 +297,7 @@ int generate_moves(moves *glist) {
           attacks = pawn_attacks[pos_side][source];
 
           if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
-            add_move(glist, encode_move(p, source, pos_ep, 0, 1, 0, 1, 0));
+            add_move(&glist, encode_move(p, source, pos_ep, 0, 1, 0, 1, 0));
             clear_bit(attacks, pos_ep);
           }
 
@@ -303,12 +306,12 @@ int generate_moves(moves *glist) {
           while (attacks) {
             target = first_set_bit(attacks);
             if (source > h3) { // capture and promotion
-              add_move(glist, encode_move(p, source, target, q, 1, 0, 0, 0));
-              add_move(glist, encode_move(p, source, target, r, 1, 0, 0, 0));
-              add_move(glist, encode_move(p, source, target, b, 1, 0, 0, 0));
-              add_move(glist, encode_move(p, source, target, n, 1, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, q, 1, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, r, 1, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, b, 1, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, n, 1, 0, 0, 0));
             } else { // simple capture
-              add_move(glist, encode_move(p, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(p, source, target, 0, 1, 0, 0, 0));
             }
 
             clear_bit(attacks, target);
@@ -326,9 +329,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[white], target)) {
-              add_move(glist, encode_move(n, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(n, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(n, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(n, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -348,9 +351,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[white], target)) {
-              add_move(glist, encode_move(b, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(b, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(b, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(b, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -368,9 +371,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[white], target)) {
-              add_move(glist, encode_move(r, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(r, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(r, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(r, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -387,9 +390,9 @@ int generate_moves(moves *glist) {
             target = first_set_bit(attacks);
 
             if (is_set(pos_occupancies[white], target)) {
-              add_move(glist, encode_move(q, source, target, 0, 1, 0, 0, 0));
+              add_move(&glist, encode_move(q, source, target, 0, 1, 0, 0, 0));
             } else {
-              add_move(glist, encode_move(q, source, target, 0, 0, 0, 0, 0));
+              add_move(&glist, encode_move(q, source, target, 0, 0, 0, 0, 0));
             }
             clear_bit(attacks, target);
           }
@@ -403,7 +406,7 @@ int generate_moves(moves *glist) {
                                                  // make sure e8 and f8 are not under attack
             if (!is_square_attacked(e8, white) &&
                 !is_square_attacked(f8, white)) {
-              add_move(glist, encode_move(k, e8, g8, 0, 0, 0, 0, 1));
+              add_move(&glist, encode_move(k, e8, g8, 0, 0, 0, 0, 1));
             }
           }
         }
@@ -413,7 +416,7 @@ int generate_moves(moves *glist) {
                                                    // make sure e8 and d8 are not under attack
             if (!is_square_attacked(e8, white) &&
                 !is_square_attacked(d8, white)) {
-              add_move(glist, encode_move(k, e8, c8, 0, 0, 0, 0, 1));
+              add_move(&glist, encode_move(k, e8, c8, 0, 0, 0, 0, 1));
             }
           }
         }
@@ -424,9 +427,9 @@ int generate_moves(moves *glist) {
           target = first_set_bit(attacks);
 
           if (is_set(pos_occupancies[white], target)) {
-            add_move(glist, encode_move(k, source, target, 0, 1, 0, 0, 0));
+            add_move(&glist, encode_move(k, source, target, 0, 1, 0, 0, 0));
           } else {
-            add_move(glist, encode_move(k, source, target, 0, 0, 0, 0, 0));
+            add_move(&glist, encode_move(k, source, target, 0, 0, 0, 0, 0));
           }
           clear_bit(attacks, target);
         }
@@ -435,7 +438,6 @@ int generate_moves(moves *glist) {
   }
 
 
-  sort_caps(glist);
-  U64 total = glist->current_index;
-  return total;
+  sort_caps(&glist);
+  return &glist;
 }
