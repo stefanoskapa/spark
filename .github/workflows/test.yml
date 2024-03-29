@@ -12,6 +12,8 @@ jobs:
       run: sudo apt-get update && sudo apt-get install build-essential -y
     - name: Build
       run: make
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
     - name: Run tests
       run: build/spark
 
