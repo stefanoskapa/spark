@@ -62,5 +62,6 @@ int pop(int_stack *is);
 typedef struct {
   int moves[256];
   int current_index;
+  int capture_count;
 } moves;
 #endif

@@ -66,6 +66,7 @@ static inline void add_prio(moves *mlist, int move) {
       move = temp; 
     }
     nextCapIndex++;
+    mlist->capture_count++;
   }
   mlist->moves[mlist->current_index++] = move;
 }
@@ -103,7 +104,7 @@ static inline void sort_caps(moves *mlist) {
 moves* generate_moves() {
   static moves glist;
   glist.current_index = 0;
-
+  glist.capture_count = 0;
   nextCapIndex = 0;
   int source, target;
   U64 bitboard, attacks;
