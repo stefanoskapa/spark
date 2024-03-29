@@ -86,9 +86,12 @@ static inline void sort_caps(moves *mlist) {
 
     for (int j = i; j < nextCapIndex; j++) { 
       int move = mlist->moves[j];
-      int profit = piece_values[pos_occupancy[get_move_target(move)]] - piece_values[get_move_piece(move)];
+      int profit;
       if (get_move_ep(move))
         profit = 0;
+      else  
+        profit = piece_values[pos_occupancy[get_move_target(move)]] - piece_values[get_move_piece(move)];
+      
       if (profit > max) {
         max = profit;
         best_index = j;
