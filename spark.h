@@ -72,6 +72,7 @@ typedef struct int_stack {
 typedef struct {
   int moves[256];
   int current_index;
+  int capture_count;
 } moves;
 
 extern char ascii_pieces[12];
