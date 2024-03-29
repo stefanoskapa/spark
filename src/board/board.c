@@ -392,50 +392,6 @@ void takeback() {
   pos_side = !pos_side;                    // change turn
 }
 
-
-
-void fast_make(int move) {
-
-  U64 const sourceBB = 1ULL << get_move_source(move);
-  U64 const targetBB = 1ULL << get_move_target(move);
-
-  if (get_move_ep(move)) {
-    if (pos_side == white) 
-      pos_occupancies[2] &= ~(1ULL << (pos_ep + 8)); // remove captured pawn
-    else
-      pos_occupancies[2] &= ~(1ULL << (pos_ep - 8)); // remove captured pawn
-  }
-    pos_occupancies[2] &= (~sourceBB); // remove source from total occupancy
-    pos_occupancies[2] |= targetBB;    // add target to total occupancy
-
-  push(&pos_moves, move); // push new move
-}
-
-void fast_unmake() {
-
-  int lmove = pop(&pos_moves);
-
-  int const source = get_move_source(lmove);
-  int const target = get_move_target(lmove);
-  U64 const sourceBB = 1ULL << source;
-  U64 const targetBB = 1ULL << target;
-
-  pos_occupancies[2] |= sourceBB;         // add piece's source to total occupancy
-  pos_occupancies[2] &= (~targetBB);      // remove piece's target from total occupancy
-
-  if (get_move_capture(lmove)) { // restore captured piece
-
-    if (get_move_ep(lmove)) {
-      int ep_target = target + (pos_side == black ? -8 : +8);
-      pos_occupancies[2] |= 1ULL << ep_target; // add ep-captured pawn to total occupancy
-    } else {
-      pos_occupancies[2] |= targetBB; // add captured piece to total occupancy
-    }
-  }
-
-}
-
-
 // int_stack functions
 
 inline void push(int_stack *is, int item) { is->items[is->index++] = item; }
