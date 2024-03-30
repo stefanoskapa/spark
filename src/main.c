@@ -129,7 +129,7 @@ void divide(int depth) {
 
   U64 nodes = 0;
 
-  moves move_list = *generate_moves(&move_list);
+  moves move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 
@@ -150,7 +150,7 @@ U64 perft(int depth) {
   if (depth == 0)
     return 1ULL;
 
-  moves move_list = *generate_moves();
+  moves move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 

@@ -101,8 +101,8 @@ static inline void sort_caps(moves *mlist) {
 
 
 
-moves* generate_moves() {
-  static moves glist;
+moves generate_moves() {
+  moves glist;
   glist.current_index = 0;
   glist.capture_count = 0;
   nextCapIndex = 0;
@@ -440,5 +440,5 @@ moves* generate_moves() {
 
 
   sort_caps(&glist);
-  return &glist;
+  return glist;
 }
