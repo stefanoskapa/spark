@@ -33,6 +33,17 @@
 #define get_move_castling(move)      ((move & enc_cast))
 #define get_move_check(move)         ((move & enc_check))
 
+typedef struct {
+  int items[400];
+  int index;
+} int_stack;
+
+typedef struct {
+  int moves[256];
+  int current_index;
+  int capture_count;
+} moves;
+
 enum {
   a8,b8,c8,d8,e8,f8,g8,h8,
   a7,b7,c7,d7,e7,f7,g7,h7,
@@ -64,16 +75,6 @@ static const U64 f1g1 = (1ULL << f1) | (1ULL << g1);
 static const U64 d1c1b1 = (1ULL << d1) | (1ULL << c1) | (1ULL << b1);
 static const U64 f8g8 = (1ULL << f8) | (1ULL << g8);
 static const U64 d8c8b8 = (1ULL << d8) | (1ULL << c8) | (1ULL << b8);
-
-typedef struct int_stack {
-  int items[400];
-  int index;
-} int_stack;
-typedef struct {
-  int moves[256];
-  int current_index;
-  int capture_count;
-} moves;
 
 extern char ascii_pieces[12];
 extern int char_pieces[];
