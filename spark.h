@@ -1,6 +1,11 @@
 #ifndef SPARK_H
 #define SPARK_H
 
+#define is_set(bitboard, square) bitboard & (1ULL << square)
+#define set_bit(bitboard, bit_nr) bitboard |= (1ULL << bit_nr)
+#define clear_bit(bitboard, bit_nr) bitboard &= ~(1ULL << bit_nr)
+
+
 #define U64 unsigned long long
 #define enc_piece 		0xF
 #define enc_source		0x3F0
