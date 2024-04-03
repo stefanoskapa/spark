@@ -92,7 +92,7 @@ extern int pos_side;
 extern int pos_ep;
 extern int pos_castling;
 extern int first_pos_ep;
-extern int knight_attacks[];
+extern int knight_attacks[64];
 
 void print_move_UCI(int move);
 char* get_move_UCI(int move);
