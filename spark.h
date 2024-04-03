@@ -87,6 +87,7 @@ extern int pos_side;
 extern int pos_ep;
 extern int pos_castling;
 extern int first_pos_ep;
+extern int knight_attacks[];
 
 void print_move_UCI(int move);
 char* get_move_UCI(int move);
@@ -101,4 +102,7 @@ void parse_fen(char *fen_string);
 void push(int_stack *is, int item);
 int pop(int_stack *is);
 U64 get_queen_attacks(int square, U64 total_occupancy);
+U64 get_bishop_attacks(int square, U64 total_occupancy);
+U64 get_rook_attacks(int square, U64 total_occupancy);
+
 #endif
