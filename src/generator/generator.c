@@ -33,7 +33,7 @@ int piece_values[] = {
  */
 static inline void add_move(moves *mlist, int move) {
 
-
+/*
   int piece = get_move_piece(move);
 
   //precheck
@@ -49,13 +49,13 @@ static inline void add_move(moves *mlist, int move) {
       return;
     }
   }
-
+*/
  // full check
   make_move(move);
   if (!isKingInCheck(!pos_side)) { //legal move
-    //if (isKingInCheck(pos_side)) {
-    //  move = set_move_check(move); 
-    //}
+    if (isKingInCheck(pos_side)) {
+      move = set_move_check(move); 
+    }
     add_prio(mlist, move);
   }
   takeback();
