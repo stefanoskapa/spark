@@ -1,4 +1,3 @@
-
 #include "../attack_tables/attack_tables.h"
 #include "../bit_utils/bit_utils.h"
 #include "../board/board.h"
@@ -29,7 +28,7 @@ int is_square_attacked(int square, int side) { // attacking side
   }
 }
 
-void show_board() {
+void show_board(void) {
   for (int square = 0; square < 64; square++) {
     if (square % 8 == 0)
       printf("\n");
@@ -65,7 +64,7 @@ void show_board() {
 }
 
 
-void show_occ_board() {
+void show_occ_board(void) {
   for (int square = 0; square < 64; square++) {
     if (square % 8 == 0)
       printf("\n");
@@ -81,12 +80,12 @@ void show_occ_board() {
 
 
 
-void fen_error() {
+void fen_error(void) {
   printf("Invalid FEN string\n");
   exit(1);
 }
 
-void clean_board() {
+void clean_board(void) {
   for (size_t i = 0; i < sizeof(pos_pieces)/sizeof(pos_pieces[0]); i++)
     pos_pieces[i]=0ULL;
 

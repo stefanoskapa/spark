@@ -1,5 +1,3 @@
-
-#include <stdio.h>
 #include <limits.h>
 #include "../attack_tables/attack_tables.h"
 #include "../bit_utils/bit_utils.h"
@@ -105,7 +103,7 @@ static inline void sort_caps(moves *mlist) {
 
 
 
-moves generate_moves() {
+moves generate_moves(void) {
   moves glist;
   glist.current_index = 0;
   glist.capture_count = 0;

@@ -1,5 +1,4 @@
 #include "attack_tables/attack_tables.h"
-#include "bit_utils/bit_utils.h"
 #include "board_utils/board_utils.h"
 #include "board/board.h"
 #include "generator/generator.h"
@@ -7,7 +6,6 @@
 #include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
 U64 perft_captures = 0;
@@ -56,18 +54,18 @@ struct perf_test pos_list[] = { // results taken from chessprogramming.org/Perft
 
 
 
-int main() {
+int main(void) {
 
   printf("engine started\n\n");
   init_attack_tables();
   benchmark();  
   perft_suite(5);
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 
 
-void benchmark() {
+void benchmark(void) {
   printf("\n--> Benchmarking (Initial Position)...\n");
   parse_fen(pos_list[0].pos);
   run_perft(6);

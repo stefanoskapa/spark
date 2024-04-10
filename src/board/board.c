@@ -1,13 +1,9 @@
 #include "../attack_tables/attack_tables.h"
 #include "../bit_utils/bit_utils.h"
 #include "../board_utils/board_utils.h"
-#include "../generator/generator.h"
 #include "../move_encoding/move_encoding.h"
 #include "board.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 #include <limits.h>
 
 #define NOT_H1 ~(1ULL << h1)
@@ -282,7 +278,7 @@ void make_move(int move) {
   pos_side = !(pos_side); // change turns
 }
 
-void takeback() {
+void takeback(void) {
 
   int lmove = pop(&pos_moves);
 

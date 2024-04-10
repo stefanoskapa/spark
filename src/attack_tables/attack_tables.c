@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "../board/board.h"
 #include "../bit_utils/bit_utils.h"
 #include "attack_tables.h"
@@ -66,11 +65,6 @@ U64 bishop_attacks[64][512];
 U64 rook_masks[64];
 U64 rook_attacks[64][4096];
 U64 queen_attacks[64];
-// old a8 = 0x18C0488281004900ULL
-// new a8 = 0x24a000b0c05860ULL
-
-// old c1 =  0x0820411914050404ULL
-// new c1 =  0x3011090061814180ULL
 
 U64 bishop_magic_numbers[] = {
 	0x24a000b0c05860ULL , 0x316004040041C200ULL, 0x0110110A04A20404ULL, 0x1208208020204000ULL, 
@@ -91,9 +85,6 @@ U64 bishop_magic_numbers[] = {
 	0x40005590100A0200ULL, 0x460044400C084080ULL, 0xC209040818080688ULL, 0x0502102602014200ULL
 };
 
-
-
-
 U64 rook_magic_numbers[] = {
 	0x2480004000201180L, 0x8240001002402000L, 0x0200084202201080L, 0x4480080080300004L, 
 	0x0A00140A00102018L, 0x5080040080010200L, 0x1200084100860004L, 0x020004004202812BL,
@@ -112,7 +103,6 @@ U64 rook_magic_numbers[] = {
   0x40020080C1003022L, 0x184284400130E101L, 0x100080204012000AL, 0x4003000410026009L, 
 	0x0802011448201002L, 0x20C2000810010412L, 0x8440019041220804L, 0x5200002104408402L
 };
-
 
 const int bishop_relevant_bit_count[64] = {
 	6, 5, 5, 5, 5, 5, 5, 6,
@@ -206,7 +196,7 @@ U64 get_queen_attacks(int square, U64 total_occupancy) {
 }
 
 
-void init_attack_tables() {
+void init_attack_tables(void) {
   int occupancy_indexes;
   int relevant_bits_count;
   int magic_index;
