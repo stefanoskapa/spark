@@ -66,4 +66,81 @@ void make_move(int move);
 void takeback(void);
 void push(int_stack *is, int item);
 int pop(int_stack *is);
+
+
+extern U64 king_attacks[64];
+extern U64 knight_attacks[64];
+extern U64 pawn_attacks[2][64];
+void init_attack_tables(void);
+
+U64 get_bishop_attacks(int square, U64 total_occupancy);
+U64 get_rook_attacks(int square, U64 total_occupancy);
+extern U64 get_queen_attacks(int square, U64 total_occupancy);
+U64 get_occupancy_variation(int index, U64 attack_mask);
+U64 init_king_attacks(int square);
+U64 init_knight_attacks(int square);
+U64 init_pawn_attacks(int square, int side);
+U64 get_rook_attack_mask_with_blockers(int square, U64 blocker);
+U64 get_rook_attack_mask(int square);
+U64 get_bishop_attack_mask_with_blockers(int square, U64 blocker);
+U64 get_bishop_attack_mask(int square);
+
+#define is_set(bitboard, square) bitboard & (1ULL << square)
+#define set_bit(bitboard, bit_nr) bitboard |= (1ULL << bit_nr)
+#define clear_bit(bitboard, bit_nr) bitboard &= ~(1ULL << bit_nr)
+
+void print_bitboard(U64 bitboard);
+int popcnt(U64 x);
+int first_set_bit(U64 x);
+
+
+void show_occ_board(void);
+int is_square_attacked(int square, int side);
+void show_board(void);
+void fen_error(void);
+void parse_fen(char *fen_string);
+void clean_board(void);
+
+moves generate_moves(void);
+extern moves list;
+
+
+#define enc_piece 		0xF
+#define enc_source		0x3F0
+#define enc_target    0xFC00
+#define enc_prom      0xF0000
+#define enc_capture   0x100000
+#define enc_double    0x200000
+#define enc_ep        0x400000
+#define enc_cast      0x800000
+#define enc_check     0x1000000
+
+#define encode_move(piece, source, target, prom_piece, capture, double_push, ep, castling) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10) 		  |\
+	(prom_piece << 16)  |\
+	(capture << 20)     |\
+  (double_push << 21) |\
+  (ep << 22) 					|\
+  (castling << 23)
+
+
+#define get_move_piece(move)         ((move & enc_piece )    >> 0)
+#define get_move_source(move)        ((move & enc_source)    >> 4)
+#define get_move_target(move)        ((move & enc_target)    >> 10)
+#define get_move_promotion(move)     ((move & enc_prom)      >> 16)
+#define get_move_capture(move)       ((move & enc_capture))
+#define get_move_double(move)        ((move & enc_double))
+#define get_move_ep(move)            ((move & enc_ep))
+#define get_move_castling(move)      ((move & enc_cast))
+#define get_move_check(move)         ((move & enc_check))
+
+#define set_move_check(move)         ((move | enc_check))
+char* get_move_UCI(int move);
+void print_move_list(moves* move_list);
+void print_move(int move);
+void print_move_UCI(int move);
+
+
 #endif
