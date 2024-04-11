@@ -153,16 +153,16 @@ U64 perft(int depth) {
   for (int i = 0; i < move_list.current_index; i++) {
 
     if (depth == 1) {
-      if (get_move_capture(move_list.moves[i]))
+      if (GET_MOVE_CAPTURE(move_list.moves[i]))
         perft_captures++;
 
-      if (get_move_ep(move_list.moves[i]))
+      if (GET_MOVE_EP(move_list.moves[i]))
         perft_eps++;
 
-      if (get_move_castling(move_list.moves[i]))
+      if (GET_MOVE_CASTLING(move_list.moves[i]))
         perft_castles++;
 
-      if (get_move_promotion(move_list.moves[i]))
+      if (GET_MOVE_PROMOTION(move_list.moves[i]))
         perft_promotions++;
     }
 
