@@ -139,4 +139,7 @@ U64 init_pawn_attacks(int square, int side);
 
 char* get_move_UCI(int move);
 int is_square_attacked(int square, int side);
+
+void print_move_UCI(int move);
+
 #endif
