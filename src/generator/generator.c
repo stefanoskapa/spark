@@ -103,7 +103,7 @@ static inline void sort_caps(moves *mlist) {
 
 
 moves generate_moves(void) {
-  static moves glist;
+  moves glist;
   glist.current_index = 0;
   glist.capture_count = 0;
   nextCapIndex = 0;
