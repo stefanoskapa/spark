@@ -24,6 +24,17 @@
 #define F8G8 ((1ULL << f8) | (1ULL << g8))
 #define D8C8B8 ((1ULL << d8) | (1ULL << c8) | (1ULL << b8))
 
+#define GET_MOVE_PIECE(move)         ((move & ENC_PIECE )    >> 0)
+#define GET_MOVE_SOURCE(move)        ((move & ENC_SOURCE)    >> 4)
+#define GET_MOVE_TARGET(move)        ((move & ENC_TARGET)    >> 10)
+#define GET_MOVE_PROMOTION(move)     ((move & ENC_PROM)      >> 16)
+#define GET_MOVE_CAPTURE(move)       ((move & ENC_CAPTURE))
+#define GET_MOVE_DOUBLE(move)        ((move & ENC_DOUBLE))
+#define GET_MOVE_EP(move)            ((move & ENC_EP))
+#define GET_MOVE_CASTLING(move)      ((move & ENC_CAST))
+#define GET_MOVE_CHECK(move)         ((move & ENC_CHECK))
+
+
 #define IS_SET(bitboard, square) bitboard & (1ULL << square)
 #define SET_BIT(bitboard, bit_nr) bitboard |= (1ULL << bit_nr)
 #define CLEAR_BIT(bitboard, bit_nr) bitboard &= ~(1ULL << bit_nr)
@@ -82,6 +93,9 @@ enum { wk = 1, wq = 2, bk = 4, bq = 8 };
 // piece encoding
 enum { P, N, B, R, Q, K, p, n, b, r, q, k };
 
+extern U64 king_attacks[64];
+extern U64 knight_attacks[64];
+extern U64 pawn_attacks[2][64];
 
 extern const char ascii_pieces[12];
 extern const int char_pieces[];
