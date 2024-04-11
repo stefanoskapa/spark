@@ -38,7 +38,7 @@
         }                                                    \
         printf("\n");                                        \
     }                                                        \
-    printf("%llx\n", bitboard);
+    printf("%llx\n", x);
 
 #define IS_KING_IN_CHECK(side) is_square_attacked(FIRST_SET_BIT(pos_pieces[side == WHITE ? K : k]), !side)
 
@@ -102,6 +102,7 @@ void takeback(void);
 void push(int_stack *is, int item);
 moves generate_moves();
 void show_board();
+void init_attack_tables();
 void parse_fen(char*);
 int pop(int_stack *is);
 
