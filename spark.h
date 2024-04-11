@@ -2,6 +2,16 @@
 #define SPARK_H
 
 #define U64 unsigned long long
+#define ENC_PIECE 		0xF
+#define ENC_SOURCE		0x3F0
+#define ENC_TARGET    0xFC00
+#define ENC_PROM      0xF0000
+#define ENC_CAPTURE   0x100000
+#define ENC_DOUBLE    0x200000
+#define ENC_EP        0x400000
+#define ENC_CAST      0x800000
+#define ENC_CHECK     0x1000000
+
 
 #define NOT_H1 ~(1ULL << h1)
 #define F1 1ULL << f1
