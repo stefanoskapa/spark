@@ -137,5 +137,6 @@ U64 init_king_attacks(int square);
 U64 init_knight_attacks(int square);
 U64 init_pawn_attacks(int square, int side);
 
+char* get_move_UCI(int move);
 int is_square_attacked(int square, int side);
 #endif
