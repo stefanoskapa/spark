@@ -3,6 +3,11 @@
 
 #include "../board/board.h"
 
+#define NOT_H 0x7F7F7F7F7F7F7F7FULL
+#define NOT_GH 0x3F3F3F3F3F3F3F3FULL
+#define NOT_A 0xFEFEFEFEFEFEFEFEULL
+#define NOT_AB 0xFCFCFCFCFCFCFCFCULL
+
 extern U64 king_attacks[64];
 extern U64 knight_attacks[64];
 extern U64 pawn_attacks[2][64];

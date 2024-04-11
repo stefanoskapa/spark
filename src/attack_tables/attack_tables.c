@@ -1,5 +1,4 @@
 #include "../board/board.h"
-#include "../bit_utils/bit_utils.h"
 #include "attack_tables.h"
 
 /*
@@ -51,12 +50,6 @@
   is faster than performing a popcount.
 */
 
-
-const U64 NOT_H = 0x7F7F7F7F7F7F7F7FULL;
-const U64 NOT_GH = 0x3F3F3F3F3F3F3F3FULL;
-const U64 NOT_A = 0xFEFEFEFEFEFEFEFEULL;
-const U64 NOT_AB = 0xFCFCFCFCFCFCFCFCULL;
-
 U64 pawn_attacks[2][64];
 U64 knight_attacks[64];
 U64 king_attacks[64];
@@ -66,7 +59,7 @@ U64 rook_masks[64];
 U64 rook_attacks[64][4096];
 U64 queen_attacks[64];
 
-U64 bishop_magic_numbers[] = {
+static const U64 bishop_magic_numbers[] = {
 	0x24a000b0c05860ULL , 0x316004040041C200ULL, 0x0110110A04A20404ULL, 0x1208208020204000ULL, 
 	0x0002021008008009ULL, 0x0001100210006000ULL, 0x0086080402082418ULL, 0x8001050101202200ULL,
   0x000C420401061200ULL, 0x0205020828188490ULL, 0x1000420409002801ULL, 0x9000880600400000ULL, 
@@ -85,7 +78,7 @@ U64 bishop_magic_numbers[] = {
 	0x40005590100A0200ULL, 0x460044400C084080ULL, 0xC209040818080688ULL, 0x0502102602014200ULL
 };
 
-U64 rook_magic_numbers[] = {
+static const U64 rook_magic_numbers[] = {
 	0x2480004000201180L, 0x8240001002402000L, 0x0200084202201080L, 0x4480080080300004L, 
 	0x0A00140A00102018L, 0x5080040080010200L, 0x1200084100860004L, 0x020004004202812BL,
   0x0328801382204000L, 0x0000806000400080L, 0x140100104C200100L, 0x0408801000808804L, 
@@ -104,7 +97,7 @@ U64 rook_magic_numbers[] = {
 	0x0802011448201002L, 0x20C2000810010412L, 0x8440019041220804L, 0x5200002104408402L
 };
 
-const int bishop_relevant_bit_count[64] = {
+static const int bishop_relevant_bit_count[64] = {
 	6, 5, 5, 5, 5, 5, 5, 6,
 	5, 5, 5, 5, 5, 5, 5, 5,
  	5, 5, 7, 7, 7, 7, 5, 5,
@@ -115,7 +108,7 @@ const int bishop_relevant_bit_count[64] = {
   6, 5, 5, 5, 5, 5, 5, 6
 };
 
-const int rook_relevant_bit_count[64] = {
+static const int rook_relevant_bit_count[64] = {
 	12, 11, 11, 11, 11, 11, 11, 12,
   11, 10, 10, 10, 10, 10, 10, 11,
   11, 10, 10, 10, 10, 10, 10, 11,
@@ -130,7 +123,7 @@ const int rook_relevant_bit_count[64] = {
 U64 init_pawn_attacks(int square, int side) {
 	U64 bitboard = 0ULL;
   U64 attacks = 0ULL;
-  set_bit(bitboard, square);
+  SET_BIT(bitboard, square);
 
   if (!side) { //white
     attacks |= bitboard >> 7 & NOT_A;
@@ -145,7 +138,7 @@ U64 init_pawn_attacks(int square, int side) {
 U64 init_knight_attacks(int square) {
   U64 bitboard = 0ULL;
   U64 attacks = 0ULL;
-  set_bit(bitboard, square);
+  SET_BIT(bitboard, square);
 
   attacks |= bitboard >> 6 & NOT_AB;
   attacks |= bitboard << 6 & NOT_GH;
@@ -163,7 +156,7 @@ U64 init_knight_attacks(int square) {
 U64 init_king_attacks(int square) {
   U64 bitboard = 0ULL;
   U64 attacks = 0ULL;
-  set_bit(bitboard, square);
+  SET_BIT(bitboard, square);
 
   attacks |= bitboard >> 1 & NOT_H;
   attacks |= bitboard << 1 & NOT_A;
@@ -206,8 +199,8 @@ void init_attack_tables(void) {
   for (int square = 0; square < 64; square++) {
    
 	 //init pawns
-  	pawn_attacks[white][square] = init_pawn_attacks(square, white);
-    pawn_attacks[black][square] = init_pawn_attacks(square, black);
+  	pawn_attacks[WHITE][square] = init_pawn_attacks(square, WHITE);
+    pawn_attacks[BLACK][square] = init_pawn_attacks(square, BLACK);
 		//init knights
     knight_attacks[square] = init_knight_attacks(square);
 		// init kings
@@ -216,7 +209,7 @@ void init_attack_tables(void) {
 		//init bishops
     bishop_masks[square] = get_bishop_attack_mask(square);
     attack_mask = bishop_masks[square];
-    relevant_bits_count = popcnt(attack_mask);
+    relevant_bits_count = POPCNT(attack_mask);
     occupancy_indexes = (1 << relevant_bits_count);
     for (int index = 0; index < occupancy_indexes; index++) {
     	occupancy = get_occupancy_variation(index,attack_mask);
@@ -227,7 +220,7 @@ void init_attack_tables(void) {
     //init rooks
     rook_masks[square] = get_rook_attack_mask(square);
     attack_mask = rook_masks[square];
-    relevant_bits_count = popcnt(attack_mask);
+    relevant_bits_count = POPCNT(attack_mask);
     occupancy_indexes = (1 << relevant_bits_count);
     for (int index = 0; index < occupancy_indexes; index++) {
     	occupancy = get_occupancy_variation(index,attack_mask);
@@ -362,12 +355,12 @@ U64 get_rook_attack_mask_with_blockers(int square, U64 blocker) {
 
 U64 get_occupancy_variation(int index, U64 attack_mask) {
 
-    int bit_count = popcnt(attack_mask);
+    int bit_count = POPCNT(attack_mask);
     U64 occupancy = 0ULL;
 
     for (int count = 0; count < bit_count; count++) {
-        U64 square = first_set_bit(attack_mask);
-        clear_bit(attack_mask,square);
+        U64 square = FIRST_SET_BIT(attack_mask);
+        CLEAR_BIT(attack_mask,square);
 
         if (index & (1 << count)) {  //decide whether to include the count-th bit of the attack mask
             occupancy |= (1ULL << square);

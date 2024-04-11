@@ -9,10 +9,10 @@ void print_move_UCI(int move) {
 char* get_move_UCI(int move) {
   static char str[6];
   str[0] = '\0';
-  strcat(str, square_to_coordinates[get_move_source(move)]);
-  strcat(str, square_to_coordinates[get_move_target(move)]);
-  if (get_move_promotion(move)) {
-    str[4] = promoted_pieces[get_move_promotion(move)];
+  strcat(str, square_to_coordinates[GET_MOVE_SOURCE(move)]);
+  strcat(str, square_to_coordinates[GET_MOVE_TARGET(move)]);
+  if (GET_MOVE_PROMOTION(move)) {
+    str[4] = promoted_pieces[GET_MOVE_PROMOTION(move)];
     str[5] = '\0';
   } else {
     str[4] = '\0';
@@ -29,18 +29,18 @@ void print_move_list(moves* move_list) {
 
 void print_move(int move) {
 
-	char prom_piece = ascii_pieces[get_move_promotion(move)];
+	char prom_piece = ascii_pieces[GET_MOVE_PROMOTION(move)];
   
 	printf("------------------------\n");
-	printf("Piece:.............%c\n", ascii_pieces[get_move_piece(move)]);
-	printf("Source:............%s\n", square_to_coordinates[get_move_source(move)]);
-	printf("Target:............%s\n", square_to_coordinates[get_move_target(move)]);
+	printf("Piece:.............%c\n", ascii_pieces[GET_MOVE_PIECE(move)]);
+	printf("Source:............%s\n", square_to_coordinates[GET_MOVE_SOURCE(move)]);
+	printf("Target:............%s\n", square_to_coordinates[GET_MOVE_TARGET(move)]);
   printf("Promoted piece:....%c\n", prom_piece == 'P' ? ' ' : prom_piece);
-  printf("Capture:...........%s\n", get_move_capture(move) ? "true" : "false");
-  printf("Double Pawn Move:..%s\n", get_move_double(move) ? "true" : "false");	
-  printf("En Passant:........%s\n", get_move_ep(move) ? "true" : "false");	
-  printf("Castling:..........%s\n", get_move_castling(move) ? "true" : "false");		
-  printf("Is Check:..........%s\n", get_move_check(move) ? "true" : "false");	
+  printf("Capture:...........%s\n", GET_MOVE_CAPTURE(move) ? "true" : "false");
+  printf("Double Pawn Move:..%s\n", GET_MOVE_DOUBLE(move) ? "true" : "false");	
+  printf("En Passant:........%s\n", GET_MOVE_EP(move) ? "true" : "false");	
+  printf("Castling:..........%s\n", GET_MOVE_CASTLING(move) ? "true" : "false");		
+  printf("Is Check:..........%s\n", GET_MOVE_CHECK(move) ? "true" : "false");	
   printf("------------------------\n\n");
 
 

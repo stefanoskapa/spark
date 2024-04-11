@@ -18,17 +18,18 @@
 #ifndef SPARK_MOVE_ENCODING_H
 #define SPARK_MOVE_ENCODING_H
 
-#define enc_piece 		0xF
-#define enc_source		0x3F0
-#define enc_target    0xFC00
-#define enc_prom      0xF0000
-#define enc_capture   0x100000
-#define enc_double    0x200000
-#define enc_ep        0x400000
-#define enc_cast      0x800000
-#define enc_check     0x1000000
+#include "../board/board.h"
+#define ENC_PIECE 		0xF
+#define ENC_SOURCE		0x3F0
+#define ENC_TARGET    0xFC00
+#define ENC_PROM      0xF0000
+#define ENC_CAPTURE   0x100000
+#define ENC_DOUBLE    0x200000
+#define ENC_EP        0x400000
+#define ENC_CAST      0x800000
+#define ENC_CHECK     0x1000000
 
-#define encode_move(piece, source, target, prom_piece, capture, double_push, ep, castling) \
+#define ENCODE_MOVE(piece, source, target, prom_piece, capture, double_push, ep, castling) \
   (piece) 					  |\
 	(source << 4) 		  |\
 	(target << 10) 		  |\
@@ -38,21 +39,65 @@
   (ep << 22) 					|\
   (castling << 23)
 
+#define ENCODE_EP(piece, source, target) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10) 		  |\
+	(1ULL << 20)        |\
+  (1ULL << 22) 		
 
-#define get_move_piece(move)         ((move & enc_piece )    >> 0)
-#define get_move_source(move)        ((move & enc_source)    >> 4)
-#define get_move_target(move)        ((move & enc_target)    >> 10)
-#define get_move_promotion(move)     ((move & enc_prom)      >> 16)
-#define get_move_capture(move)       ((move & enc_capture))
-#define get_move_double(move)        ((move & enc_double))
-#define get_move_ep(move)            ((move & enc_ep))
-#define get_move_castling(move)      ((move & enc_cast))
-#define get_move_check(move)         ((move & enc_check))
+#define ENCODE_PROM(piece, source, target, prom_piece) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10) 		  |\
+	(prom_piece << 16)
 
-#define set_move_check(move)         ((move | enc_check))
+#define ENCODE_DOUBLE(piece, source, target) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10) 		  |\
+  (1ULL << 21)
+
+#define ENCODE_SIMPLE_MOVE(piece, source, target) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10)
+
+#define ENCODE_SIMPLE_CAPTURE(piece, source, target) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10) 		  |\
+	(1ULL << 20)
+
+#define ENCODE_CASTLING(piece, source, target) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10) 		  |\
+  (1ULL << 23)
+
+#define ENCODE_CAP_PROM(piece, source, target, prom_piece) \
+  (piece) 					  |\
+	(source << 4) 		  |\
+	(target << 10) 		  |\
+	(prom_piece << 16)  |\
+	(1ULL << 20)
+
+
+#define GET_MOVE_PIECE(move)         ((move & ENC_PIECE )    >> 0)
+#define GET_MOVE_SOURCE(move)        ((move & ENC_SOURCE)    >> 4)
+#define GET_MOVE_TARGET(move)        ((move & ENC_TARGET)    >> 10)
+#define GET_MOVE_PROMOTION(move)     ((move & ENC_PROM)      >> 16)
+#define GET_MOVE_CAPTURE(move)       ((move & ENC_CAPTURE))
+#define GET_MOVE_DOUBLE(move)        ((move & ENC_DOUBLE))
+#define GET_MOVE_EP(move)            ((move & ENC_EP))
+#define GET_MOVE_CASTLING(move)      ((move & ENC_CAST))
+#define GET_MOVE_CHECK(move)         ((move & ENC_CHECK))
+
+#define SET_MOVE_CHECK(move)         ((move | ENC_CHECK))
+
 char* get_move_UCI(int move);
 void print_move_list(moves* move_list);
 void print_move(int move);
 void print_move_UCI(int move);
 
-#endif //SPARK_MOVE_ENCODING_H
+#endif

@@ -1,11 +1,9 @@
 #include "../attack_tables/attack_tables.h"
-#include "../bit_utils/bit_utils.h"
 #include "../board/board.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "../bit_utils/bit_utils.h"
 #include "board_utils.h"
 
 
@@ -13,15 +11,15 @@ int is_square_attacked(int square, int side) { // attacking side
 
   if (!side) {
     return      
-      (get_bishop_attacks(square, pos_occupancies[2]) & (pos_pieces[B] | pos_pieces[Q])) ||
-      (get_rook_attacks(square, pos_occupancies[2]) & (pos_pieces[R] | pos_pieces[Q])) ||
+      (get_bishop_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[B] | pos_pieces[Q])) ||
+      (get_rook_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[R] | pos_pieces[Q])) ||
       (knight_attacks[square] & pos_pieces[N]) ||
       (pawn_attacks[!side][square] & pos_pieces[P]) ||
       (king_attacks[square] & pos_pieces[K]);
   } else {
     return       
-      (get_bishop_attacks(square, pos_occupancies[2]) & (pos_pieces[b] | pos_pieces[q])) ||
-      (get_rook_attacks(square, pos_occupancies[2]) & (pos_pieces[r] | pos_pieces[q])) ||
+      (get_bishop_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[b] | pos_pieces[q])) ||
+      (get_rook_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[r] | pos_pieces[q])) ||
       (knight_attacks[square] & pos_pieces[n]) ||
       (pawn_attacks[!side][square] & pos_pieces[p]) ||
       (king_attacks[square] & pos_pieces[k]);
@@ -34,7 +32,7 @@ void show_board(void) {
       printf("\n");
     char char_to_show = '.';
     for (int piece = 0; piece < 12; piece++) {
-      if (is_set(pos_pieces[piece], square)) {
+      if (IS_SET(pos_pieces[piece], square)) {
         char_to_show = ascii_pieces[piece];
         break;
       }
@@ -43,9 +41,9 @@ void show_board(void) {
   }
 
   printf("\n\nside:        ");
-  if (pos_side == white)
+  if (pos_side == WHITE)
     printf("white");
-  else if (pos_side == black)
+  else if (pos_side == BLACK)
     printf("black");
   printf("\n");
 
@@ -92,9 +90,9 @@ void clean_board(void) {
   for (int i = 0; i < 64; i++)
     pos_occupancy[i] = INT_MAX;
 
-  pos_occupancies[0] = 0ULL;
-  pos_occupancies[1] = 0ULL;
-  pos_occupancies[2] = 0ULL;
+  pos_occupancies[WHITE] = 0ULL;
+  pos_occupancies[BLACK] = 0ULL;
+  pos_occupancies[BOTH] = 0ULL;
   first_pos_ep = none;
   pos_moves.index = 0;
   pos_captured.index = 0;
@@ -120,8 +118,8 @@ void parse_fen(char *fen_string) {
     } else if (ch != '/') {
       pos_pieces[char_pieces[ch]] |= 1ULL << square;
       pos_occupancy[square] = char_pieces[ch];
-      pos_occupancies[both] |= 1ULL << square;
-      pos_occupancies[ch > 'Z' ? black : white] |= 1ULL << square;
+      pos_occupancies[BOTH] |= 1ULL << square;
+      pos_occupancies[ch > 'Z' ? BLACK : WHITE] |= 1ULL << square;
       square++;
     }
   }
@@ -130,9 +128,9 @@ void parse_fen(char *fen_string) {
   fen_index++;
   ch = fen_string[fen_index];
   if (ch == 'w')
-    pos_side = white;
+    pos_side = WHITE;
   else if (ch == 'b')
-    pos_side = black;
+    pos_side = BLACK;
   else
     fen_error();
 

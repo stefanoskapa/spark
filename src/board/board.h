@@ -3,6 +3,49 @@
 
 #define U64 unsigned long long
 
+#define NOT_H1 ~(1ULL << h1)
+#define F1 1ULL << f1
+#define NOT_A1 ~(1ULL << a1)
+#define D1 1ULL << d1
+#define NOT_H8 ~(1ULL << h8)
+#define F8 1ULL << f8
+#define NOT_A8 ~(1ULL << a8)
+#define D8 1ULL << d8
+#define NOT_F1 ~(1ULL << f1)
+#define H1 1ULL << h1
+#define NOT_D1 ~(1ULL << d1)
+#define A1 1ULL << a1
+#define NOT_F8 ~(1ULL << f8)
+#define H8 1ULL << h8
+#define NOT_D8 ~(1ULL << d8)
+#define A8 1ULL << a8
+#define F1G1 ((1ULL << f1) | (1ULL << g1))
+#define D1C1B1 ((1ULL << d1) | (1ULL << c1) | (1ULL << b1))
+#define F8G8 ((1ULL << f8) | (1ULL << g8))
+#define D8C8B8 ((1ULL << d8) | (1ULL << c8) | (1ULL << b8))
+
+#define IS_SET(bitboard, square) bitboard & (1ULL << square)
+#define SET_BIT(bitboard, bit_nr) bitboard |= (1ULL << bit_nr)
+#define CLEAR_BIT(bitboard, bit_nr) bitboard &= ~(1ULL << bit_nr)
+#define POPCNT(x) __builtin_popcountll(x)
+#define FIRST_SET_BIT(x) __builtin_ctzll(x)
+#define PRINT_BB(x)                                    \
+    printf("\n")                                             \
+    for (int rank = 0; rank < 8; rank++) {                   \
+        for (int file = 0; file < 8; file++) {               \
+            int square = rank * 8 + file;                    \
+            printf(" %c ", IS_SET(x, square) ? 'X' : '-');   \
+        }                                                    \
+        printf("\n");                                        \
+    }                                                        \
+    printf("%llx\n", bitboard);
+
+#define IS_KING_IN_CHECK(side) is_square_attacked(FIRST_SET_BIT(pos_pieces[side == WHITE ? K : k]), !side)
+
+#define WHITE 0
+#define BLACK 1
+#define BOTH 2
+
 typedef struct {
   int items[400];
   int index;
@@ -26,8 +69,6 @@ enum {
   none
 };
 
-enum { white, black, both };
-
 /**
  * Castling
  *
@@ -41,16 +82,11 @@ enum { wk = 1, wq = 2, bk = 4, bq = 8 };
 // piece encoding
 enum { P, N, B, R, Q, K, p, n, b, r, q, k };
 
-static const U64 f1g1 = (1ULL << f1) | (1ULL << g1);
-static const U64 d1c1b1 = (1ULL << d1) | (1ULL << c1) | (1ULL << b1);
-static const U64 f8g8 = (1ULL << f8) | (1ULL << g8);
-static const U64 d8c8b8 = (1ULL << d8) | (1ULL << c8) | (1ULL << b8);
 
-
-extern char ascii_pieces[12];
-extern int char_pieces[];
-extern int promoted_pieces[];
-extern char *square_to_coordinates[];
+extern const char ascii_pieces[12];
+extern const int char_pieces[];
+extern const int promoted_pieces[];
+extern const char *square_to_coordinates[];
 extern U64 pos_pieces[12];
 extern U64 pos_occupancies[3];
 extern int pos_occupancy[64];
@@ -61,9 +97,9 @@ extern int first_pos_ep;
 extern int_stack pos_castling_stack;
 extern int_stack pos_captured;
 extern int_stack pos_moves;
-int isKingInCheck(int side);
 void make_move(int move);
 void takeback(void);
 void push(int_stack *is, int item);
 int pop(int_stack *is);
+
 #endif
