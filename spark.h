@@ -100,6 +100,9 @@ extern int_stack pos_moves;
 void make_move(int move);
 void takeback(void);
 void push(int_stack *is, int item);
+moves generate_moves();
+void show_board();
+void parse_fen(char*);
 int pop(int_stack *is);
 
 #endif
