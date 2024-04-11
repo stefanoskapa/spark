@@ -136,5 +136,5 @@ U64 get_occupancy_variation(int index, U64 attack_mask);
 U64 init_king_attacks(int square);
 U64 init_knight_attacks(int square);
 U64 init_pawn_attacks(int square, int side);
-U
+
 #endif
