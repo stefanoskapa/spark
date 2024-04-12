@@ -30,15 +30,15 @@ static const int piece_values[] = {
  */
 static inline void add_move(moves *mlist, int move) {
 
-/*
-  int piece = get_move_piece(move);
+
+  int piece = GET_MOVE_PIECE(move);
 
   //precheck
-  if (piece != K && piece != k && !get_move_ep(move)) {
-    const U64 sourceBB = 1ULL << get_move_source(move);
+  if (piece != K && piece != k && !GET_MOVE_EP(move)) {
+    const U64 sourceBB = 1ULL << GET_MOVE_SOURCE(move);
     pos_pieces[piece] &= ~(sourceBB);
     pos_occupancies[2] &= ~(sourceBB);
-    int isInCheck = isKingInCheck(pos_side);
+    int isInCheck = IS_KING_IN_CHECK(pos_side);
     pos_pieces[piece] |= sourceBB;
     pos_occupancies[2] |= sourceBB;
     if (!isInCheck) {
@@ -46,13 +46,13 @@ static inline void add_move(moves *mlist, int move) {
       return;
     }
   }
-*/
+
  // full check
   make_move(move);
   if (!IS_KING_IN_CHECK((!pos_side))) { //legal move
-    if (IS_KING_IN_CHECK(pos_side)) {
-      move = SET_MOVE_CHECK(move); 
-    }
+//    if (IS_KING_IN_CHECK(pos_side)) {
+ //     move = SET_MOVE_CHECK(move); 
+ //   }
     add_prio(mlist, move);
   }
   takeback();
@@ -111,6 +111,8 @@ moves generate_moves(void) {
   U64 bitboard, attacks;
   int const min = pos_side ? p : P;
   int const max = min + 5;
+  U64 const my_neg_occ = ~pos_occupancies[pos_side]; //my negative occupancy
+  U64 const his_occ = pos_occupancies[!pos_side];
 
   for (int piece = min; piece <= max; piece++) {
 
@@ -146,7 +148,7 @@ moves generate_moves(void) {
             CLEAR_BIT(attacks, pos_ep);
           }
 
-          attacks &= pos_occupancies[BLACK];
+          attacks &= his_occ;
 
           while (attacks) {
             target = FIRST_SET_BIT(attacks);
@@ -164,17 +166,18 @@ moves generate_moves(void) {
         break;
 
       case N:
+      case n:
         while (bitboard) {
           source = FIRST_SET_BIT(bitboard);
-          attacks = knight_attacks[source] & (~pos_occupancies[WHITE]); // don't capture own pieces
+          attacks = knight_attacks[source] & my_neg_occ; // don't capture own pieces
 
           while (attacks) { // loop over target squares
             target = FIRST_SET_BIT(attacks);
 
-            if (IS_SET(pos_occupancies[BLACK], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(N, source, target));
+            if (IS_SET(his_occ, target)) {
+              add_move(&glist, ENCODE_SIMPLE_CAPTURE(piece, source, target));
             } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(N, source, target));
+              add_move(&glist, ENCODE_SIMPLE_MOVE(piece, source, target));
             }
             CLEAR_BIT(attacks, target);
           }
@@ -183,17 +186,17 @@ moves generate_moves(void) {
         break;
 
       case B:
+      case b:
         while (bitboard) {
           source = FIRST_SET_BIT(bitboard);
-          attacks = get_bishop_attacks(source, pos_occupancies[BOTH]) &
-            (~pos_occupancies[WHITE]);
+          attacks = get_bishop_attacks(source, pos_occupancies[BOTH]) & my_neg_occ;
           while (attacks) { // loop over target squares
             target = FIRST_SET_BIT(attacks);
 
-            if (IS_SET(pos_occupancies[BLACK], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(B, source, target));
+            if (IS_SET(his_occ, target)) {
+              add_move(&glist, ENCODE_SIMPLE_CAPTURE(piece, source, target));
             } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(B, source, target));
+              add_move(&glist, ENCODE_SIMPLE_MOVE(piece, source, target));
             }
             CLEAR_BIT(attacks, target);
           }
@@ -202,18 +205,18 @@ moves generate_moves(void) {
         break;
 
       case R:
+      case r:
         while (bitboard) {
           source = FIRST_SET_BIT(bitboard);
 
-          attacks = get_rook_attacks(source, pos_occupancies[BOTH]) &
-            (~pos_occupancies[WHITE]);
+          attacks = get_rook_attacks(source, pos_occupancies[BOTH]) & my_neg_occ;
           while (attacks) { // loop over target squares
             target = FIRST_SET_BIT(attacks);
 
-            if (IS_SET(pos_occupancies[BLACK], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(R, source, target));
+            if (IS_SET(his_occ, target)) {
+              add_move(&glist, ENCODE_SIMPLE_CAPTURE(piece, source, target));
             } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(R, source, target));
+              add_move(&glist, ENCODE_SIMPLE_MOVE(piece, source, target));
             }
             CLEAR_BIT(attacks, target);
           }
@@ -222,23 +225,24 @@ moves generate_moves(void) {
         break;
 
       case Q:
+      case q:
         while (bitboard) {
           source = FIRST_SET_BIT(bitboard);
-          attacks = get_queen_attacks(source, pos_occupancies[BOTH]) &
-            (~pos_occupancies[WHITE]);
+          attacks = get_queen_attacks(source, pos_occupancies[BOTH]) & my_neg_occ;
           while (attacks) { // loop over target squares
             target = FIRST_SET_BIT(attacks);
 
-            if (IS_SET(pos_occupancies[BLACK], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(Q, source, target));
+            if (IS_SET(his_occ, target)) {
+              add_move(&glist, ENCODE_SIMPLE_CAPTURE(piece, source, target));
             } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(Q, source, target));
+              add_move(&glist, ENCODE_SIMPLE_MOVE(piece, source, target));
             }
             CLEAR_BIT(attacks, target);
           }
           CLEAR_BIT(bitboard, source);
         }
         break;
+
 
       case K:
         if (pos_castling & wk) {
@@ -320,88 +324,7 @@ moves generate_moves(void) {
           }
         }
         break;
-
-      case n:
-
-        while (bitboard) {
-          source = FIRST_SET_BIT(bitboard);
-          attacks = knight_attacks[source] & (~pos_occupancies[BLACK]); // don't capture own pieces
-                                                                        // loop over target squares
-          while (attacks) {
-            target = FIRST_SET_BIT(attacks);
-
-            if (IS_SET(pos_occupancies[WHITE], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(n, source, target));
-            } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(n, source, target));
-            }
-            CLEAR_BIT(attacks, target);
-          }
-
-          CLEAR_BIT(bitboard, source);
-        }
-
-        break;
-
-      case b:
-        while (bitboard) {
-          source = FIRST_SET_BIT(bitboard);
-
-          attacks = get_bishop_attacks(source, pos_occupancies[BOTH]) &
-            (~pos_occupancies[BLACK]);
-          while (attacks) { // loop over target squares
-            target = FIRST_SET_BIT(attacks);
-
-            if (IS_SET(pos_occupancies[WHITE], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(b, source, target));
-            } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(b, source, target));
-            }
-            CLEAR_BIT(attacks, target);
-          }
-          CLEAR_BIT(bitboard, source);
-        }
-        break;
-
-      case r:
-        while (bitboard) {
-          source = FIRST_SET_BIT(bitboard);
-
-          attacks = get_rook_attacks(source, pos_occupancies[BOTH]) &
-            (~pos_occupancies[BLACK]);
-          while (attacks) { // loop over target squares
-            target = FIRST_SET_BIT(attacks);
-
-            if (IS_SET(pos_occupancies[WHITE], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(r, source, target));
-            } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(r, source, target));
-            }
-            CLEAR_BIT(attacks, target);
-          }
-          CLEAR_BIT(bitboard, source);
-        }
-        break;
-
-      case q:
-        while (bitboard) {
-          source = FIRST_SET_BIT(bitboard);
-          attacks = get_queen_attacks(source, pos_occupancies[BOTH]) &
-            (~pos_occupancies[BLACK]);
-          while (attacks) { // loop over target squares
-            target = FIRST_SET_BIT(attacks);
-
-            if (IS_SET(pos_occupancies[WHITE], target)) {
-              add_move(&glist, ENCODE_SIMPLE_CAPTURE(q, source, target));
-            } else {
-              add_move(&glist, ENCODE_SIMPLE_MOVE(q, source, target));
-            }
-            CLEAR_BIT(attacks, target);
-          }
-          CLEAR_BIT(bitboard, source);
-        }
-        break;
-
+      
       case k:
         if (pos_castling & bk) {
           if (!(pos_occupancies[BOTH] & F8G8)) { // f8 and g8 are not occupied
