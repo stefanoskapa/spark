@@ -142,4 +142,5 @@ int is_square_attacked(int square, int side);
 
 void print_move_UCI(int move);
 
+void show_occ_board(void);
 #endif
