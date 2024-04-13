@@ -93,6 +93,7 @@ extern int pos_occupancy[64];
 extern int pos_side;
 extern int pos_ep;
 extern int pos_castling;
+extern int pos_cap_piece;
 extern int_stack irrev_aspects;
 extern int_stack pos_moves;
 void make_move(int move);
