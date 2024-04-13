@@ -3,6 +3,12 @@
 #include "board.h"
 #include "../move_encoding/move_encoding.h"
 
+static inline void push(int_stack *is, int item);
+static inline int pop(int_stack *is);
+
+static inline void save_state(void);
+static inline void load_state(void);
+
 // board state
 U64 pos_pieces[12];
 U64 pos_occupancies[3]; // 0 = White, 1 = Black, 2 = Both
@@ -10,10 +16,33 @@ int pos_occupancy[64];
 int pos_side = 1;
 int pos_ep = none;
 int pos_castling;
+int pos_cap_piece = 0;
 
 int_stack pos_moves = {{0}, 0};
-int_stack pos_captured = {{0}, 0};
-int_stack pos_castling_stack = {{0}, 0};
+
+/*
+   0000 0000 0000 0000 0000 0000 0000 1111   pos_castling
+   0000 0000 0000 0000 0000 0000 1111 0000   captured piece
+   0000 0000 0000 0000 0011 1111 0000 0000   pos_ep
+ */
+
+static int_stack irrev_aspects = {{0},0};
+
+static inline void save_state(void) {
+  unsigned int state = 0;
+  state |= pos_castling;
+  state |= pos_cap_piece << 4;
+  state |= pos_ep << 8;
+  push(&irrev_aspects,state);
+}
+
+static inline void load_state(void) {
+  unsigned int state = pop(&irrev_aspects);
+  pos_castling = state & 15;
+  pos_cap_piece = (state >> 4) & 15;
+  pos_ep = (state >> 8) & 63;
+}
+
 
 const char ascii_pieces[] = "PNBRQKpnbrqk";
 
@@ -34,11 +63,9 @@ const char *square_to_coordinates[] = {
   "e3", "f3", "g3", "h3", "a2", "b2", "c2", "d2", "e2", "f2", "g2",
   "h2", "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"};
 
-int first_pos_ep = none;
-
 void make_move(int move) {
 
-  push(&pos_castling_stack, pos_castling); // save castling state
+  save_state(); //save irreversibe aspects of the position, since they are about to be modified 
 
   int const piece = GET_MOVE_PIECE(move);
   int const source = GET_MOVE_SOURCE(move);
@@ -46,11 +73,11 @@ void make_move(int move) {
   int const prom_piece = GET_MOVE_PROMOTION(move);
   U64 const sourceBB = 1ULL << source;
   U64 const targetBB = 1ULL << target;
-  
+
   if (pos_side == WHITE) {
     if (GET_MOVE_CAPTURE(move)) {
       if (GET_MOVE_EP(move)) {
-        push(&pos_captured, p);
+        pos_cap_piece = p;
         pos_occupancy[pos_ep + 8] = INT_MAX;
         U64 pawn_kill = ~(1ULL << (pos_ep + 8));
         pos_pieces[p] &= pawn_kill;
@@ -66,7 +93,7 @@ void make_move(int move) {
         }
 
         pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
-        push(&pos_captured, dead_piece);       // push captured piece to stack
+        pos_cap_piece = dead_piece;
         pos_occupancy[target] = INT_MAX;	    // remove captured piece from occupancy array			
         pos_occupancies[BLACK] &= ~targetBB;     // remove captured piece from black's occupancy
       }
@@ -77,7 +104,7 @@ void make_move(int move) {
     pos_occupancy[source] = INT_MAX; // remove piece from occupancy array
     pos_occupancies[BOTH] &= (~sourceBB);        // remove source from total occupancy
     pos_occupancies[WHITE] &= (~sourceBB); // remove source to white's  occupancy
-   
+
     if (prom_piece){     // promotion
       pos_pieces[prom_piece] |= targetBB; // add promoted piece to bitboard
       pos_occupancy[target] = prom_piece; // add promoted piece to occupancy array
@@ -132,7 +159,7 @@ void make_move(int move) {
   } else { //black
     if (GET_MOVE_CAPTURE(move)) {
       if (GET_MOVE_EP(move)) {
-        push(&pos_captured, P);
+        pos_cap_piece = P;
         pos_occupancy[pos_ep - 8] = INT_MAX;
         U64 pawn_kill = ~(1ULL << (pos_ep - 8));
         pos_pieces[P] &= pawn_kill;
@@ -148,7 +175,7 @@ void make_move(int move) {
         }
 
         pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
-        push(&pos_captured, dead_piece);       // push captured piece to stack
+        pos_cap_piece = dead_piece;
         pos_occupancy[target] = INT_MAX;	    // remove captured piece from occupancy array			
         pos_occupancies[WHITE] &= ~targetBB;     // remove captured piece from white's occupancy
       }
@@ -159,7 +186,7 @@ void make_move(int move) {
     pos_occupancy[source] = INT_MAX; // remove piece from occupancy array
     pos_occupancies[BOTH] &= (~sourceBB);        // remove source from total occupancy
     pos_occupancies[BLACK] &= (~sourceBB); // remove source from black's  occupancy
-    
+
     if (prom_piece){     // promotion
       pos_pieces[prom_piece] |= targetBB; // add promoted piece to bitboard
       pos_occupancy[target] = prom_piece; // add promoted piece to occupancy array
@@ -219,68 +246,51 @@ void make_move(int move) {
 
 void takeback(void) {
 
-  int lmove = pop(&pos_moves);
+  static int source, target, piece, lmove, pr_piece;
+  static U64 sourceBB, targetBB, notTargetBB;  
 
-  int const source = GET_MOVE_SOURCE(lmove);
-  int const target = GET_MOVE_TARGET(lmove);
-  int const piece = GET_MOVE_PIECE(lmove);
-  int const pr_piece = GET_MOVE_PROMOTION(lmove);
-  U64 const sourceBB = 1ULL << source;
-  U64 const targetBB = 1ULL << target;
+  lmove = pop(&pos_moves);
+  source = GET_MOVE_SOURCE(lmove);
+  target = GET_MOVE_TARGET(lmove);
+  piece = GET_MOVE_PIECE(lmove);
+  sourceBB = 1ULL << source;
+  targetBB = 1ULL << target;
+  notTargetBB = ~targetBB;
 
-  if (pr_piece) {
-    if (pos_side) {
-      pos_pieces[P] |= sourceBB; // put pawn back to source
-      pos_occupancy[source] = P;
-    } else {
-      pos_pieces[p] |= sourceBB; // put pawn back to source
-      pos_occupancy[source] = p;
-    }
-
-    pos_pieces[pr_piece] &= (~targetBB);      // remove promoted piece
+  if ((pr_piece = GET_MOVE_PROMOTION(lmove))) {
+    pos_pieces[piece] |= sourceBB; // put pawn back to source
+    pos_pieces[pr_piece] &= notTargetBB;      // remove promoted piece
   } else {
     pos_pieces[piece] |= sourceBB;    // put piece back to source
-    pos_occupancy[source] = piece;
-    pos_pieces[piece] &= (~targetBB); // remove piece from target
+    pos_pieces[piece] &= notTargetBB; // remove piece from target
   }
-  pos_occupancy[target] = INT_MAX;
-  
+  pos_occupancy[source] = piece;
+
   pos_occupancies[BOTH] |= sourceBB;         // add piece to total occupancy
   pos_occupancies[!pos_side] |= sourceBB; // add piece to its color's occupancy
-  pos_occupancies[BOTH] &= (~targetBB);      // remove piece from total occupancy
-  pos_occupancies[!pos_side] &= (~targetBB); // remove piece from its color's occupancy
-
+  pos_occupancies[!pos_side] &= notTargetBB; // remove piece from its color's occupancy
+  pos_occupancies[BOTH] &= notTargetBB;      // remove piece from total occupancy
+  
   if (GET_MOVE_CAPTURE(lmove)) { // restore captured piece
-    int cap_piece = pop(&pos_captured);
 
     if (GET_MOVE_EP(lmove)) {
-      int ep_target = target + (cap_piece == P ? -8 : +8);
-      pos_pieces[cap_piece] |= 1ULL << ep_target;
-      pos_occupancy[ep_target] = cap_piece;
-      pos_occupancies[BOTH] |= 1ULL << ep_target;
-      pos_occupancies[pos_side] |= 1ULL << ep_target;
+      int ep_target = target + (pos_cap_piece == P ? -8 : +8);
+      U64 ep_target_BB = 1ULL << ep_target;
+      pos_pieces[pos_cap_piece] |= ep_target_BB; // put ep-captured pawn back
+      pos_occupancy[ep_target] = pos_cap_piece;  // same
+      pos_occupancies[BOTH] |= ep_target_BB;     // same
+      pos_occupancies[pos_side] |= ep_target_BB; // same
     } else {
-      pos_pieces[cap_piece] |= targetBB; //put captured piece back (target of last move)
-      pos_occupancy[target] = cap_piece; //update occupancies
+      pos_pieces[pos_cap_piece] |= targetBB; //put captured piece back (target of last move)
+      pos_occupancy[target] = pos_cap_piece; //update occupancies
       pos_occupancies[BOTH] |= targetBB; 
       pos_occupancies[pos_side] |= targetBB; 
     }
- 
+
+  } else {
+    pos_occupancy[target] = INT_MAX; //since its no capture, clear target square
   }
 
-  // check if last move now was a double pawn push, if yes, set pos_ep
-  if (pos_moves.index > 0) {
-    int in = pos_moves.index - 1;
-    int lastmove = pos_moves.items[in];
-    if (GET_MOVE_DOUBLE(lastmove)) {
-      pos_ep =
-        GET_MOVE_TARGET(lastmove) + (GET_MOVE_PIECE(lastmove) == P ? +8 : -8);
-    } else {
-      pos_ep = none;
-    }
-  } else {
-    pos_ep = first_pos_ep;
-  }
 
   // castling
   if (GET_MOVE_CASTLING(lmove)) {
@@ -329,15 +339,15 @@ void takeback(void) {
     }
   }
 
-  pos_castling = pop(&pos_castling_stack); // restore last castling state
+  load_state();
   pos_side = !pos_side;                    // change turn
 }
 
 // int_stack functions
 
-inline void push(int_stack *is, int item) { is->items[is->index++] = item; }
+static inline void push(int_stack *is, int item) { is->items[is->index++] = item; }
 
-inline int pop(int_stack *is) {
+static inline int pop(int_stack *is) {
   is->index--;
   return is->items[is->index];
 }

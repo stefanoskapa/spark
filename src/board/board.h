@@ -99,7 +99,5 @@ extern int_stack pos_captured;
 extern int_stack pos_moves;
 void make_move(int move);
 void takeback(void);
-void push(int_stack *is, int item);
-int pop(int_stack *is);
 
 #endif

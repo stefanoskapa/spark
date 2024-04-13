@@ -93,11 +93,8 @@ void clean_board(void) {
   pos_occupancies[WHITE] = 0ULL;
   pos_occupancies[BLACK] = 0ULL;
   pos_occupancies[BOTH] = 0ULL;
-  first_pos_ep = none;
   pos_moves.index = 0;
-  pos_captured.index = 0;
-  pos_castling_stack.index = 0;
-
+ 
 }
 void parse_fen(char *fen_string) {
   if (strlen(fen_string) < 24 || strlen(fen_string) > 80)
@@ -173,7 +170,6 @@ void parse_fen(char *fen_string) {
   } else {
     pos_ep = fen_string[fen_index] - 'a';
     pos_ep += ('8' - fen_string[fen_index + 1]) * 8;
-    first_pos_ep = pos_ep;
   }
 
 
