@@ -26,7 +26,7 @@ int_stack pos_moves = {{0}, 0};
    0000 0000 0000 0000 0011 1111 0000 0000   pos_ep
  */
 
-static int_stack irrev_aspects = {{0},0};
+int_stack irrev_aspects = {{0},0};
 
 static inline void save_state(void) {
   unsigned int state = 0;

@@ -94,7 +94,7 @@ void clean_board(void) {
   pos_occupancies[BLACK] = 0ULL;
   pos_occupancies[BOTH] = 0ULL;
   pos_moves.index = 0;
- 
+  irrev_aspects.index = 0; 
 }
 void parse_fen(char *fen_string) {
   if (strlen(fen_string) < 24 || strlen(fen_string) > 80)
