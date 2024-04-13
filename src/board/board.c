@@ -246,33 +246,55 @@ void make_move(int move) {
 
 void takeback(void) {
 
-  static int source, target, piece, lmove, pr_piece;
-  static U64 sourceBB, targetBB, notTargetBB;  
+  static int source, target, piece, lmove;
+  static U64 sourceBB, targetBB;  
 
   lmove = pop(&pos_moves);
   source = GET_MOVE_SOURCE(lmove);
   target = GET_MOVE_TARGET(lmove);
   piece = GET_MOVE_PIECE(lmove);
+  int const pr_piece = GET_MOVE_PROMOTION(lmove); 
   sourceBB = 1ULL << source;
   targetBB = 1ULL << target;
-  notTargetBB = ~targetBB;
+  /*
+     if ((pr_piece = GET_MOVE_PROMOTION(lmove))) {
+     pos_pieces[piece] |= sourceBB; // put pawn back to source
+     pos_pieces[pr_piece] &= notTargetBB;      // remove promoted piece
+     } else {
+     pos_pieces[piece] |= sourceBB;    // put piece back to source
+     pos_pieces[piece] &= notTargetBB; // remove piece from target
+     }
 
-  if ((pr_piece = GET_MOVE_PROMOTION(lmove))) {
-    pos_pieces[piece] |= sourceBB; // put pawn back to source
-    pos_pieces[pr_piece] &= notTargetBB;      // remove promoted piece
+     pos_occupancy[target] = INT_MAX; //since its no capture, clear target square
+     pos_occupancy[source] = piece;
+
+     pos_occupancies[BOTH] |= sourceBB;         // add piece to total occupancy
+     pos_occupancies[!pos_side] |= sourceBB; // add piece to its color's occupancy
+     pos_occupancies[!pos_side] &= notTargetBB; // remove piece from its color's occupancy
+     pos_occupancies[BOTH] &= notTargetBB;      // remove piece from total occupancy
+   */
+  if (pr_piece) {
+    if (pos_side) {
+      pos_pieces[P] |= sourceBB; // put pawn back to source
+      pos_occupancy[source] = P;
+    } else {
+      pos_pieces[p] |= sourceBB; // put pawn back to source
+      pos_occupancy[source] = p;
+    }
+
+    pos_pieces[pr_piece] &= (~targetBB);      // remove promoted piece
   } else {
     pos_pieces[piece] |= sourceBB;    // put piece back to source
-    pos_pieces[piece] &= notTargetBB; // remove piece from target
+    pos_occupancy[source] = piece;
+    pos_pieces[piece] &= (~targetBB); // remove piece from target
   }
-  
-  pos_occupancy[target] = INT_MAX; //since its no capture, clear target square
-  pos_occupancy[source] = piece;
+  pos_occupancy[target] = INT_MAX;
 
   pos_occupancies[BOTH] |= sourceBB;         // add piece to total occupancy
   pos_occupancies[!pos_side] |= sourceBB; // add piece to its color's occupancy
-  pos_occupancies[!pos_side] &= notTargetBB; // remove piece from its color's occupancy
-  pos_occupancies[BOTH] &= notTargetBB;      // remove piece from total occupancy
-  
+  pos_occupancies[BOTH] &= (~targetBB);      // remove piece from total occupancy
+  pos_occupancies[!pos_side] &= (~targetBB); // remove piece from its color's occupancy
+
   if (GET_MOVE_CAPTURE(lmove)) { // restore captured piece
     if (GET_MOVE_EP(lmove)) {
       int ep_target = target + (pos_cap_piece == P ? -8 : +8);
