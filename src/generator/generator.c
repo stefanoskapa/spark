@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <limits.h>
 #include "../attack_tables/attack_tables.h"
 #include "../board_utils/board_utils.h"
@@ -85,9 +86,13 @@ static inline void sort_caps(moves *mlist) {
       int profit;
       if (GET_MOVE_EP(move))
         profit = 0;
-      else  
+      else { 
+        show_occ_board();
+        printf("captured piece: %d\n", pos_occupancy[GET_MOVE_TARGET(move)]);      
+        printf("capturer: %d\n", GET_MOVE_PIECE(move));
         profit = piece_values[pos_occupancy[GET_MOVE_TARGET(move)]] - piece_values[GET_MOVE_PIECE(move)];
       
+      }
       if (profit > max) {
         max = profit;
         best_index = j;
