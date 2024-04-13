@@ -264,6 +264,8 @@ void takeback(void) {
     pos_pieces[piece] |= sourceBB;    // put piece back to source
     pos_pieces[piece] &= notTargetBB; // remove piece from target
   }
+  
+  pos_occupancy[target] = INT_MAX; //since its no capture, clear target square
   pos_occupancy[source] = piece;
 
   pos_occupancies[BOTH] |= sourceBB;         // add piece to total occupancy
@@ -272,7 +274,6 @@ void takeback(void) {
   pos_occupancies[BOTH] &= notTargetBB;      // remove piece from total occupancy
   
   if (GET_MOVE_CAPTURE(lmove)) { // restore captured piece
-
     if (GET_MOVE_EP(lmove)) {
       int ep_target = target + (pos_cap_piece == P ? -8 : +8);
       U64 ep_target_BB = 1ULL << ep_target;
@@ -287,8 +288,6 @@ void takeback(void) {
       pos_occupancies[pos_side] |= targetBB; 
     }
 
-  } else {
-    pos_occupancy[target] = INT_MAX; //since its no capture, clear target square
   }
 
 
