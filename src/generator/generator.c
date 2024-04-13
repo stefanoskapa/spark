@@ -91,6 +91,9 @@ static inline void sort_caps(moves *mlist) {
         print_move(move);
         printf("captured piece: %d\n", pos_occupancy[GET_MOVE_TARGET(move)]);      
         printf("capturer: %d\n", GET_MOVE_PIECE(move));
+        PRINT_BB(pos_occupancies[0]);
+        PRINT_BB(pos_occupancies[1]);
+        PRINT_BB(pos_occupancies[2]);
         profit = piece_values[pos_occupancy[GET_MOVE_TARGET(move)]] - piece_values[GET_MOVE_PIECE(move)];
       
       }

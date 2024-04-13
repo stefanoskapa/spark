@@ -30,7 +30,7 @@
 #define POPCNT(x) __builtin_popcountll(x)
 #define FIRST_SET_BIT(x) __builtin_ctzll(x)
 #define PRINT_BB(x)                                    \
-    printf("\n")                                             \
+    printf("\n");                                            \
     for (int rank = 0; rank < 8; rank++) {                   \
         for (int file = 0; file < 8; file++) {               \
             int square = rank * 8 + file;                    \
@@ -38,7 +38,7 @@
         }                                                    \
         printf("\n");                                        \
     }                                                        \
-    printf("%llx\n", bitboard);
+    printf("%llx\n", x);
 
 #define IS_KING_IN_CHECK(side) is_square_attacked(FIRST_SET_BIT(pos_pieces[side == WHITE ? K : k]), !side)
 
