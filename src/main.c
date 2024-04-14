@@ -59,7 +59,7 @@ int main(void) {
   printf("engine started\n\n");
   init_attack_tables();
   benchmark();  
-  perft_suite(5);
+  perft_suite(6);
   return EXIT_SUCCESS;
 }
 
