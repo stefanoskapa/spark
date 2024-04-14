@@ -88,6 +88,12 @@ static inline void sort_caps(moves *mlist) {
         profit = 0;
       else { 
         show_occ_board();
+        printf("[ SORTING MOVE ]\n");
+        printf("moves that lead to this position:\n");
+
+        for (int i = 0; i < pos_moves.index; i ++) {
+          print_move_UCI(pos_moves.items[i]);
+        }
         print_move(move);
         printf("captured piece: %d\n", pos_occupancy[GET_MOVE_TARGET(move)]);      
         printf("capturer: %d\n", GET_MOVE_PIECE(move));
