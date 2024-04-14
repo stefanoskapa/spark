@@ -58,8 +58,14 @@ int main(void) {
 
   printf("engine started\n\n");
   init_attack_tables();
-  benchmark();  
-  perft_suite(6);
+//  benchmark();  
+  //perft_suite(6);
+  
+  //parse_fen(pos_list[2].pos);
+  //parse_fen("4n3/3P4/6k1/8/8/8/8/1K6 w - - 0 1");
+  
+  parse_fen("rnbqkbnr/ppp2ppp/4p3/3p4/3P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 0 3");
+  divide(6); 
   return EXIT_SUCCESS;
 }
 
@@ -132,11 +138,12 @@ void divide(int depth) {
   for (int i = 0; i < move_list.current_index; i++) {
 
     nodes = 0;
-    print_move_UCI(move_list.moves[i]);
+    //print_move_UCI(move_list.moves[i]);
+    printf("%s: ",get_move_UCI(move_list.moves[i]));
     make_move(move_list.moves[i]);
     nodes += perft(depth - 1);
     takeback();
-    printf("%llu\n\n", nodes);
+    printf("%llu\n", nodes);
   }
 }
 
