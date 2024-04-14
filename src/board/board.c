@@ -75,10 +75,11 @@ void make_move(int move) {
   U64 const targetBB = 1ULL << target;
 
   if (pos_side == WHITE) {
+
     if (GET_MOVE_CAPTURE(move)) {
       if (GET_MOVE_EP(move)) {
-        pos_cap_piece = p;
-        pos_occupancy[pos_ep + 8] = INT_MAX;
+        pos_cap_piece = p;    
+        pos_occupancy[pos_ep + 8] = INT_MAX; //remove captured pawn
         U64 pawn_kill = ~(1ULL << (pos_ep + 8));
         pos_pieces[p] &= pawn_kill;
         pos_occupancies[BLACK] &= pawn_kill;
@@ -246,16 +247,14 @@ void make_move(int move) {
 
 void takeback(void) {
 
-  static int source, target, piece, lmove;
-  static U64 sourceBB, targetBB;  
+  int lmove = pop(&pos_moves);
 
-  lmove = pop(&pos_moves);
-  source = GET_MOVE_SOURCE(lmove);
-  target = GET_MOVE_TARGET(lmove);
-  piece = GET_MOVE_PIECE(lmove);
-  int const pr_piece = GET_MOVE_PROMOTION(lmove); 
-  sourceBB = 1ULL << source;
-  targetBB = 1ULL << target;
+  int const source = GET_MOVE_SOURCE(lmove);
+  int const target = GET_MOVE_TARGET(lmove);
+  int const piece = GET_MOVE_PIECE(lmove);
+  int const pr_piece = GET_MOVE_PROMOTION(lmove);
+  U64 const sourceBB = 1ULL << source;
+  U64 const targetBB = 1ULL << target;
   /*
      if ((pr_piece = GET_MOVE_PROMOTION(lmove))) {
      pos_pieces[piece] |= sourceBB; // put pawn back to source
