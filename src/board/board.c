@@ -78,33 +78,34 @@ void make_move(int move) {
 
     if (GET_MOVE_CAPTURE(move)) {
       if (GET_MOVE_EP(move)) {
-        pos_cap_piece = p;    
-        pos_occupancy[pos_ep + 8] = INT_MAX; //remove captured pawn
-        U64 pawn_kill = ~(1ULL << (pos_ep + 8));
-        pos_pieces[p] &= pawn_kill;
-        pos_occupancies[BLACK] &= pawn_kill;
-        pos_occupancies[BOTH] &= pawn_kill;
+        pos_cap_piece = p;                        // store captured pawn in pos_cap_piece 
+        pos_occupancy[pos_ep + 8] = INT_MAX;      // remove ep-captured pawn from pos_occupancy
+        U64 pawn_kill = ~(1ULL << (pos_ep + 8));  // prepare bitboard that kills the ep-captured pawn
+        pos_pieces[p] &= pawn_kill;               // remove ep-captured pawn from pos_pieces
+        pos_occupancies[BLACK] &= pawn_kill;      // remove ep-catpured pawn from pos_occupancies[BLACK]
+        pos_occupancies[BOTH] &= pawn_kill;       // remove ep-captured pawn from pos_occupancies[BOTH]
       } else {                              // not ep
-        int dead_piece = pos_occupancy[target];
-        if (dead_piece == r) { // rook captured, adjust black's castling rights
+        pos_cap_piece = pos_occupancy[target];    // since its not ep, the piece about to be captured will be on pos_occupancy[target]
+        
+        if (pos_cap_piece == r) {                    // adjust castling rights if rook has been captured on a8 or h8
           if (target == a8)
             pos_castling &= 7;
           else if (target == h8)
             pos_castling &= 11;
         }
-
-        pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
-        pos_cap_piece = dead_piece;
-        pos_occupancy[target] = INT_MAX;	    // remove captured piece from occupancy array			
+        // No need to update pos_occupancies[BOTH], since moving piece will be occupying the same square
+        // No need to remove captured piece from pos_occupancy[target], since it will be updated later by the moving piece
+        
+        pos_pieces[pos_cap_piece] &= (~targetBB);   // remove captured piece from pos_pieces
         pos_occupancies[BLACK] &= ~targetBB;     // remove captured piece from black's occupancy
       }
     }
 
     // Move piece to target
-    pos_pieces[piece] &= (~sourceBB); // remove piece from source
-    pos_occupancy[source] = INT_MAX; // remove piece from occupancy array
+    pos_pieces[piece] &= (~sourceBB);            // remove piece from source
+    pos_occupancy[source] = INT_MAX;             // remove piece's source from occupancy array
     pos_occupancies[BOTH] &= (~sourceBB);        // remove source from total occupancy
-    pos_occupancies[WHITE] &= (~sourceBB); // remove source to white's  occupancy
+    pos_occupancies[WHITE] &= (~sourceBB);       // remove source to white's  occupancy
 
     if (prom_piece){     // promotion
       pos_pieces[prom_piece] |= targetBB; // add promoted piece to bitboard
@@ -167,17 +168,18 @@ void make_move(int move) {
         pos_occupancies[WHITE] &= pawn_kill;
         pos_occupancies[BOTH] &= pawn_kill;
       } else {                              // not ep
-        int dead_piece = pos_occupancy[target];
-        if (dead_piece == R) { // rook captured, adjust white's castling rights
+        pos_cap_piece = pos_occupancy[target];
+        
+        if (pos_cap_piece == R) { // rook captured, adjust white's castling rights
           if (target == a1)
             pos_castling &= 13;
           else if (target == h1)
             pos_castling &= 14;
         }
 
-        pos_pieces[dead_piece] &= (~targetBB); // remove captured piece
-        pos_cap_piece = dead_piece;
-        pos_occupancy[target] = INT_MAX;	    // remove captured piece from occupancy array			
+        // No need to update pos_occupancies[BOTH], since moving piece will be occupying the same square
+        // No need to remove captured piece from pos_occupancy[target], since it will be updated later by the moving piece
+        pos_pieces[pos_cap_piece] &= (~targetBB); // remove captured piece
         pos_occupancies[WHITE] &= ~targetBB;     // remove captured piece from white's occupancy
       }
     }
@@ -255,42 +257,29 @@ void takeback(void) {
   int const pr_piece = GET_MOVE_PROMOTION(lmove);
   U64 const sourceBB = 1ULL << source;
   U64 const targetBB = 1ULL << target;
-  /*
-     if ((pr_piece = GET_MOVE_PROMOTION(lmove))) {
-     pos_pieces[piece] |= sourceBB; // put pawn back to source
-     pos_pieces[pr_piece] &= notTargetBB;      // remove promoted piece
-     } else {
-     pos_pieces[piece] |= sourceBB;    // put piece back to source
-     pos_pieces[piece] &= notTargetBB; // remove piece from target
-     }
+  
 
-     pos_occupancy[target] = INT_MAX; //since its no capture, clear target square
-     pos_occupancy[source] = piece;
-
-     pos_occupancies[BOTH] |= sourceBB;         // add piece to total occupancy
-     pos_occupancies[!pos_side] |= sourceBB; // add piece to its color's occupancy
-     pos_occupancies[!pos_side] &= notTargetBB; // remove piece from its color's occupancy
-     pos_occupancies[BOTH] &= notTargetBB;      // remove piece from total occupancy
-   */
-  if (pr_piece) {
-    if (pos_side) {
-      pos_pieces[P] |= sourceBB; // put pawn back to source
-      pos_occupancy[source] = P;
-    } else {
-      pos_pieces[p] |= sourceBB; // put pawn back to source
-      pos_occupancy[source] = p;
-    }
-
+  if (pr_piece) {  //handle promotion
     pos_pieces[pr_piece] &= (~targetBB);      // remove promoted piece
-  } else {
-    pos_pieces[piece] |= sourceBB;    // put piece back to source
-    pos_occupancy[source] = piece;
-    pos_pieces[piece] &= (~targetBB); // remove piece from target
   }
-  pos_occupancy[target] = INT_MAX;
+    /* 1. Normal promotion
+          a) clear pos_occupancies[BOTH]
+          b) clear pos_ccupancies[pos_side]
+       2. Promotion by capture
+          a) add captured piece to pos_pieces
+          b) leave pos_occupancies[BOTH] as is
+          
+    */
+    
+  pos_pieces[piece] |= sourceBB;    // put piece back to source
+  
+  pos_pieces[piece] &= (~targetBB); // remove piece from target (no-effect on promotions)
+  pos_occupancy[source] = piece;
+  
+  pos_occupancy[target] = INT_MAX; //
 
   pos_occupancies[BOTH] |= sourceBB;         // add piece to total occupancy
-  pos_occupancies[!pos_side] |= sourceBB; // add piece to its color's occupancy
+  pos_occupancies[!pos_side] |= sourceBB;    // add piece to its color's occupancy
   pos_occupancies[BOTH] &= (~targetBB);      // remove piece from total occupancy
   pos_occupancies[!pos_side] &= (~targetBB); // remove piece from its color's occupancy
 
@@ -304,9 +293,9 @@ void takeback(void) {
       pos_occupancies[pos_side] |= ep_target_BB; // same
     } else {
       pos_pieces[pos_cap_piece] |= targetBB; //put captured piece back (target of last move)
-      pos_occupancy[target] = pos_cap_piece; //update occupancies
-      pos_occupancies[BOTH] |= targetBB; 
-      pos_occupancies[pos_side] |= targetBB; 
+      pos_occupancy[target] = pos_cap_piece; // restore captured piece in pos_occupancy
+      pos_occupancies[BOTH] |= targetBB;     // restore captured piece in pos_occupanices[BOTH]
+      pos_occupancies[pos_side] |= targetBB;  // restore captured piece in pos_occupancies[opponent]
     }
 
   }
