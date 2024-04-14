@@ -27,11 +27,10 @@ static const int piece_values[] = {
  * possibly result in a check. Exceptions: king moves and EP!
  * This is to avoid make/unmake whenever possible, as those
  * are expensive operations.
- *
  */
 static inline void add_move(moves *mlist, int move) {
 
-
+/* 
   int piece = GET_MOVE_PIECE(move);
 
   //precheck
@@ -42,14 +41,16 @@ static inline void add_move(moves *mlist, int move) {
     int isInCheck = IS_KING_IN_CHECK(pos_side);
     pos_pieces[piece] |= sourceBB;
     pos_occupancies[2] |= sourceBB;
+    printf("move %s: %d\n", get_move_UCI(move), isInCheck);
     if (!isInCheck) {
       add_prio(mlist, move);
       return;
     }
   }
-
+*/
  // full check
-  make_move(move);
+ //TODO investigate bug r7/1P6/3p4/K1p5/1R3p1k/4P3/6P1/8 w - - 1 4
+ make_move(move);
   if (!IS_KING_IN_CHECK((!pos_side))) { //legal move
 //    if (IS_KING_IN_CHECK(pos_side)) {
  //     move = SET_MOVE_CHECK(move); 

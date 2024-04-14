@@ -62,10 +62,9 @@ int main(void) {
   //perft_suite(6);
   
   //parse_fen(pos_list[2].pos);
-  //parse_fen("4n3/3P4/6k1/8/8/8/8/1K6 w - - 0 1");
-  
-  parse_fen("rnbqkbnr/ppp2ppp/4p3/3p4/3P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 0 3");
-  divide(6); 
+  parse_fen("r7/1P6/3p4/K1p5/1R3p1k/4P3/6P1/8 w - - 1 4"); 
+  printf("king in check: %d\n", IS_KING_IN_CHECK(pos_side));
+  divide(1); 
   return EXIT_SUCCESS;
 }
 
@@ -140,6 +139,7 @@ void divide(int depth) {
     nodes = 0;
     //print_move_UCI(move_list.moves[i]);
     printf("%s: ",get_move_UCI(move_list.moves[i]));
+    fflush(stdout);
     make_move(move_list.moves[i]);
     nodes += perft(depth - 1);
     takeback();
