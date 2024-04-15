@@ -59,12 +59,8 @@ int main(void) {
   printf("engine started\n\n");
   init_attack_tables();
 //  benchmark();  
-  //perft_suite(6);
+  perft_suite(8);
   
-  //parse_fen(pos_list[2].pos);
-  parse_fen("r7/1P6/3p4/K1p5/1R3p1k/4P3/6P1/8 w - - 1 4"); 
-  printf("king in check: %d\n", IS_KING_IN_CHECK(pos_side));
-  divide(1); 
   return EXIT_SUCCESS;
 }
 

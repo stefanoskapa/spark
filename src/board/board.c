@@ -23,7 +23,7 @@ int_stack pos_moves = {{0}, 0};
 /*
    0000 0000 0000 0000 0000 0000 0000 1111   pos_castling
    0000 0000 0000 0000 0000 0000 1111 0000   captured piece
-   0000 0000 0000 0000 0011 1111 0000 0000   pos_ep
+   0000 0000 0000 0000 0111 1111 0000 0000   pos_ep
  */
 
 int_stack irrev_aspects = {{0},0};
@@ -40,7 +40,7 @@ static inline void load_state(void) {
   unsigned int state = pop(&irrev_aspects);
   pos_castling = state & 15;
   pos_cap_piece = (state >> 4) & 15;
-  pos_ep = (state >> 8) & 63;
+  pos_ep = (state >> 8) & 127;
 }
 
 
