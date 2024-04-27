@@ -47,7 +47,7 @@
 #define BOTH 2
 
 typedef struct {
-  int items[400];
+  int items[1000];
   int index;
 } int_stack;
 
