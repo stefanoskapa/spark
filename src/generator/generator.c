@@ -89,7 +89,7 @@ static inline void sort_caps(moves *mlist) {
       if (GET_MOVE_EP(move))
         profit = 0;
       else { 
-
+/*
         show_occ_board();
         printf("[ SORTING MOVE ]\n");
         printf("moves that lead to this position:\n");
@@ -103,7 +103,7 @@ static inline void sort_caps(moves *mlist) {
         PRINT_BB(pos_occupancies[0]);
         PRINT_BB(pos_occupancies[1]);
         PRINT_BB(pos_occupancies[2]);
-        
+        */
         profit = piece_values[pos_occupancy[GET_MOVE_TARGET(move)]] - piece_values[GET_MOVE_PIECE(move)];
       
       }
