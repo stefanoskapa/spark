@@ -63,7 +63,7 @@ if (!IS_KING_IN_CHECK((!pos_side))) { //legal move
 
 static inline void add_prio(moves *mlist, int move) {
 
-  if (GET_MOVE_CAPTURE(move)) {
+  if (GET_MOVE_CAPTURE(move) || GET_MOVE_PROMOTION(move)) {
     if (nextCapIndex < mlist->current_index) {
       int temp = mlist->moves[nextCapIndex];
       mlist->moves[nextCapIndex] = move;
@@ -88,6 +88,8 @@ static inline void sort_caps(moves *mlist) {
       int profit;
       if (GET_MOVE_EP(move))
         profit = 0;
+      else if (GET_MOVE_PROMOTION(move))
+        profit = piece_values[GET_MOVE_PROMOTION(move)];
       else { 
 /*
         show_occ_board();
