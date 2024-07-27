@@ -5,11 +5,11 @@
 #include "../move_encoding/move_encoding.h"
 
 
-static inline void push(int_stack *is, int item);
-static inline int pop(int_stack *is);
+static void push(int_stack *is, int item);
+static int pop(int_stack *is);
 
-static inline void save_state(void);
-static inline void load_state(void);
+static void save_state(void);
+static void load_state(void);
 
 // board state
 BB pos_pieces[12];
@@ -30,7 +30,7 @@ int_stack pos_moves = {{0}, 0};
 
 int_stack irrev_aspects = {{0},0};
 
-static inline void save_state(void) {
+static void save_state(void) {
   unsigned int state = 0;
   state |= pos_castling;
   state |= pos_cap_piece << 4;
@@ -38,7 +38,7 @@ static inline void save_state(void) {
   push(&irrev_aspects,state);
 }
 
-static inline void load_state(void) {
+static void load_state(void) {
   unsigned int state = pop(&irrev_aspects);
   pos_castling = state & 15;
   pos_cap_piece = (state >> 4) & 15;
@@ -356,9 +356,9 @@ void takeback(void) {
 
 // int_stack functions
 
-static inline void push(int_stack *is, int item) { is->items[is->index++] = item; }
+static void push(int_stack *is, int item) { is->items[is->index++] = item; }
 
-static inline int pop(int_stack *is) {
+static int pop(int_stack *is) {
   is->index--;
   return is->items[is->index];
 }

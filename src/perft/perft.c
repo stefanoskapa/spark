@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../attack_tables/attack_tables.h"
 #include "../board_utils/board_utils.h"
 #include "../board/board.h"
 #include "../generator/generator.h"
@@ -85,11 +84,10 @@ void perft_suite(int max_depth) {
       if (perft(j + 1) != pos_list[i].nodes[j]) {
         printf("failed :(\n");
         exit(1);
-      } else {
-        printf("success :)\n");
+      }
+      printf("success :)\n");
       }
     }
-  }
 
   printf("\nAll tests passed!\n");
 }
@@ -123,15 +121,13 @@ void run_perft(int depth) {
   }
 }
 
-void divide(int depth) {
+void divide(int const depth) {
 
-  BB nodes = 0;
-
-  moves move_list = generate_moves();
+  moves const move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 
-    nodes = 0;
+    BB nodes = 0;
     //print_move_UCI(move_list.moves[i]);
     printf("%s: ",get_move_UCI(move_list.moves[i]));
     fflush(stdout);
@@ -142,15 +138,14 @@ void divide(int depth) {
   }
 }
 
-BB perft(int depth) {
+BB perft(int const depth) {
 
-  //moves move_list = {{0}, 0};
   BB nodes = 0;
 
   if (depth == 0)
     return 1ULL;
 
-  moves move_list = generate_moves();
+  moves const move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 
