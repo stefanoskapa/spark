@@ -1,12 +1,12 @@
-#include "attack_tables/attack_tables.h"
-#include "board_utils/board_utils.h"
-#include "board/board.h"
-#include "generator/generator.h"
-#include "move_encoding/move_encoding.h"
-#include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "../attack_tables/attack_tables.h"
+#include "../board_utils/board_utils.h"
+#include "../board/board.h"
+#include "../generator/generator.h"
+#include "../move_encoding/move_encoding.h"
+#include "perft.h"
 
 U64 perft_captures = 0;
 U64 perft_eps = 0;

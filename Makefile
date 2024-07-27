@@ -14,8 +14,8 @@ SRCS=src/attack_tables/attack_tables.c  \
 OBJS=$(SRCS:.c=.o)
 
 # Output Binaries
-TARGET=build/perft
-LIBTARGET=build/spark.a
+TARGET=bin/perft
+LIBTARGET=bin/spark.a
 
 # Rules
 all: $(TARGET) $(LIBTARGET)
@@ -34,4 +34,4 @@ clean:
 	@rm -f $(OBJS) $(MAINOBJ) $(TARGET) $(LIBTARGET)
 
 test:
-	@build/perft
+	@bin/perft
