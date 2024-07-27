@@ -13,16 +13,16 @@ int is_square_attacked(int square, int side) { // attacking side
     return      
       (get_bishop_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[B] | pos_pieces[Q])) ||
       (get_rook_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[R] | pos_pieces[Q])) ||
-      (knight_attacks[square] & pos_pieces[N]) ||
-      (pawn_attacks[!side][square] & pos_pieces[P]) ||
-      (king_attacks[square] & pos_pieces[K]);
+      (get_knight_attacks(square) & pos_pieces[N]) ||
+      (get_pawn_attacks(square, !side) & pos_pieces[P]) ||
+      (get_king_attacks(square) & pos_pieces[K]);
   } else {
     return       
       (get_bishop_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[b] | pos_pieces[q])) ||
       (get_rook_attacks(square, pos_occupancies[BOTH]) & (pos_pieces[r] | pos_pieces[q])) ||
-      (knight_attacks[square] & pos_pieces[n]) ||
-      (pawn_attacks[!side][square] & pos_pieces[p]) ||
-      (king_attacks[square] & pos_pieces[k]);
+      (get_knight_attacks(square) & pos_pieces[n]) ||
+      (get_pawn_attacks(square,!side) & pos_pieces[p]) ||
+      (get_king_attacks(square) & pos_pieces[k]);
   }
 }
 

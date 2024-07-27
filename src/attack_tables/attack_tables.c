@@ -93,8 +93,6 @@ BB get_king_attacks(int const square) {
     return king_attacks[square];
 }
 
-
-
 BB get_bishop_attacks(int const square, BB total_occupancy) {
     total_occupancy &= bishop_masks[square];
     total_occupancy *= bishop_magic_numbers[square];
@@ -189,7 +187,6 @@ BB init_knight_attacks(int const square) {
 
     return attacks;
 }
-
 
 BB init_king_attacks(int const square) {
     BB bitboard = 0ULL;
