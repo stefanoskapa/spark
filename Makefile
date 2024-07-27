@@ -4,8 +4,7 @@ OPT=-O3
 CFLAGS=$(OPT) -g -Wall -Wextra -pedantic -std=c11
 
 # Source and Object Files
-MAIN_SRC=src/perft/perft.c
-MAIN_OBJ=src/perft/perft.o
+MAINOBJ=src/perft/perft.o
 SRCS=src/attack_tables/attack_tables.c  \
      src/board_utils/board_utils.c      \
 	 src/generator/generator.c          \
@@ -20,9 +19,8 @@ LIBTARGET=bin/spark.a
 # Rules
 all: $(TARGET) $(LIBTARGET)
 
-$(TARGET): $(OBJS) $(MAIN_OBJ)
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(MAIN_OBJ)
+$(TARGET): $(OBJS) $(MAINOBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(MAINOBJ)
 
 $(LIBTARGET): $(OBJS)
 	ar rcs $@ $(OBJS)
@@ -31,7 +29,7 @@ $(LIBTARGET): $(OBJS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	@rm -f $(OBJS) $(MAINOBJ) $(TARGET) $(LIBTARGET)
+	rm  $(OBJS) $(MAINOBJ) $(TARGET) $(LIBTARGET)
 
 test:
 	@bin/perft
