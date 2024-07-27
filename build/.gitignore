@@ -3,4 +3,5 @@
 *
 !.gitignore
 
-../*.o
+# Ignore all object files recursively
+../**/*.o
