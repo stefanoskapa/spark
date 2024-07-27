@@ -162,7 +162,7 @@ moves generate_moves(void) {
           }
 
           // captures
-          attacks = pawn_attacks[pos_side][source];
+          attacks = get_pawn_attacks(source,pos_side);
 
           if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
             add_move(&glist, ENCODE_EP(P, source, pos_ep));
@@ -190,7 +190,7 @@ moves generate_moves(void) {
       case n:
         while (bitboard) {
           source = FIRST_SET_BIT(bitboard);
-          attacks = knight_attacks[source] & my_neg_occ; // don't capture own pieces
+          attacks = get_knight_attacks(source) & my_neg_occ; // don't capture own pieces
 
           while (attacks) { // loop over target squares
             target = FIRST_SET_BIT(attacks);
@@ -287,7 +287,7 @@ moves generate_moves(void) {
         }
 
         source = FIRST_SET_BIT(bitboard);
-        attacks = king_attacks[source] & (~pos_occupancies[WHITE]);
+        attacks = get_king_attacks(source) & (~pos_occupancies[WHITE]);
         while (attacks) { // loop over target squares
           target = FIRST_SET_BIT(attacks);
 
@@ -321,7 +321,7 @@ moves generate_moves(void) {
           }
 
           // captures
-          attacks = pawn_attacks[pos_side][source];
+          attacks = get_pawn_attacks(source, pos_side);
 
           if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
             add_move(&glist, ENCODE_EP(p, source, pos_ep));
@@ -368,7 +368,7 @@ moves generate_moves(void) {
         }
 
         source = FIRST_SET_BIT(bitboard);
-        attacks = king_attacks[source] & (~pos_occupancies[BLACK]);
+        attacks = get_king_attacks(source) & (~pos_occupancies[BLACK]);
         while (attacks) { // loop over target squares
           target = FIRST_SET_BIT(attacks);
 
