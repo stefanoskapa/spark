@@ -114,12 +114,12 @@ void run_perft(int depth) {
 
     printf("\nDepth %d\n", i);
     printf("=================\n");
-    printf("Total moves: %llu\n", nodes);
-    printf("Captures: %llu\n", perft_captures);
-    printf("Eps: %llu\n", perft_eps);
-    printf("Castles: %llu\n", perft_castles);
-    printf("Promotions: %llu\n", perft_promotions);
-    printf("Time taken: %llu ms\n", time_used);
+    printf("Total moves: %lu\n", nodes);
+    printf("Captures: %lu\n", perft_captures);
+    printf("Eps: %lu\n", perft_eps);
+    printf("Castles: %lu\n", perft_castles);
+    printf("Promotions: %lu\n", perft_promotions);
+    printf("Time taken: %lu ms\n", time_used);
   }
 }
 
@@ -138,7 +138,7 @@ void divide(int depth) {
     make_move(move_list.moves[i]);
     nodes += perft(depth - 1);
     takeback();
-    printf("%llu\n", nodes);
+    printf("%lu\n", nodes);
   }
 }
 
