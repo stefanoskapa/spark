@@ -1,0 +1,6 @@
+# Ignore everything in this folder except .gitignore
+# (empty folder can't be tracked)
+*
+!.gitignore
+
+../*.o

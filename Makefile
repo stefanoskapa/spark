@@ -1,21 +1,23 @@
-# Compiler and Flags
-CC := gcc
-CFLAGS := -Ofast -flto -g -Wall -Wextra -pedantic -std=c11
+# Compiler flags
+CC=gcc
+OPT=-O3
+CFLAGS=$(OPT) -g -Wall -Wextra -pedantic -std=c11
 
 # Source and Object Files
+MAIN_SRC=src/perft/perft.c
+MAIN_OBJ=src/perft/perft.o
+SRCS=src/attack_tables/attack_tables.c  \
+     src/board_utils/board_utils.c      \
+	 src/generator/generator.c          \
+	 src/move_encoding/move_encoding.c  \
+	 src/board/board.c
+OBJS=$(SRCS:.c=.o)
 
-MAIN_SRC := src/main.c
-MAIN_OBJ := src/main.o
-SRCS := src/attack_tables/attack_tables.c src/board_utils/board_utils.c src/generator/generator.c src/move_encoding/move_encoding.c src/board/board.c
-OBJS := $(SRCS:.c=.o)
+# Output Binaries
+TARGET=build/perft
+LIBTARGET=build/spark.a
 
-# Output Executable
-TARGET := build/spark
-
-
-LIBTARGET := build/spark.a
-
-# Build Rule
+# Rules
 all: $(TARGET) $(LIBTARGET)
 
 $(TARGET): $(OBJS) $(MAIN_OBJ)
@@ -28,9 +30,8 @@ $(LIBTARGET): $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean Rule
 clean:
-	rm -f $(OBJS) $(MAINOBJ) $(TARGET) $(LIBTARGET)
+	@rm -f $(OBJS) $(MAINOBJ) $(TARGET) $(LIBTARGET)
 
-run:
-	@build/spark
+test:
+	@build/perft
