@@ -29,7 +29,7 @@ $(LIBTARGET): $(OBJS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm  $(OBJS) $(MAINOBJ) $(TARGET) $(LIBTARGET)
+	@rm  $(OBJS) $(MAINOBJ) $(TARGET) $(LIBTARGET)
 
 test:
 	@bin/perft
