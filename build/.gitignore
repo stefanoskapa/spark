@@ -2,6 +2,3 @@
 # (empty folder can't be tracked)
 *
 !.gitignore
-
-# Ignore all object files recursively
-../**/*.o
