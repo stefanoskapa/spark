@@ -55,7 +55,7 @@ struct perf_test pos_list[] = { // results taken from chessprogramming.org/Perft
 
 
 int main(void) {
-    return -1;
+    return -1; 
   printf("engine started\n\n");
   init_attack_tables();
 //  benchmark();  
