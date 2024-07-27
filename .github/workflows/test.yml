@@ -1,9 +1,6 @@
 name: Spark Move Generator Tests
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
