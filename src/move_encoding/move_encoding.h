@@ -44,7 +44,7 @@
 	(source << 4) 		  |\
 	(target << 10) 		  |\
 	(1ULL << 20)        |\
-  (1ULL << 22) 		
+  (1ULL << 22)
 
 #define ENCODE_PROM(piece, source, target, prom_piece) \
   (piece) 					  |\
@@ -95,9 +95,12 @@
 
 #define SET_MOVE_CHECK(move)         ((move | ENC_CHECK))
 
-char* get_move_UCI(int move);
-void print_move_list(moves* move_list);
+char *get_move_UCI(int move);
+
+void print_move_list(moves *move_list);
+
 void print_move(int move);
+
 void print_move_UCI(int move);
 
 #endif

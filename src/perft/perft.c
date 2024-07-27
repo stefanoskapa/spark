@@ -8,14 +8,14 @@
 #include "../move_encoding/move_encoding.h"
 #include "perft.h"
 
-U64 perft_captures = 0;
-U64 perft_eps = 0;
-U64 perft_castles = 0;
-U64 perft_promotions = 0;
+BB perft_captures = 0;
+BB perft_eps = 0;
+BB perft_castles = 0;
+BB perft_promotions = 0;
 struct perf_test {
   char title[20];
   char pos[256];
-  U64 nodes[20];
+  BB nodes[20];
   int d_count;
 };
 
@@ -96,9 +96,9 @@ void perft_suite(int max_depth) {
 
 void run_perft(int depth) {
 
-  U64 nodes;
+  BB nodes;
   clock_t start, end;
-  U64 time_used;
+  BB time_used;
 
   for (int i = 1; i <= depth; i++) {
 
@@ -125,7 +125,7 @@ void run_perft(int depth) {
 
 void divide(int depth) {
 
-  U64 nodes = 0;
+  BB nodes = 0;
 
   moves move_list = generate_moves();
 
@@ -142,10 +142,10 @@ void divide(int depth) {
   }
 }
 
-U64 perft(int depth) {
+BB perft(int depth) {
 
   //moves move_list = {{0}, 0};
-  U64 nodes = 0;
+  BB nodes = 0;
 
   if (depth == 0)
     return 1ULL;

@@ -1,0 +1,58 @@
+
+The purpose of attack_tables.c is to initialize arrays that contain
+bitboards of the squares a piece can attack (from any given square)
+in a given position and provide quick access to those arrays.
+To allow fast access for sliding pieces, the magic bitboard approach
+has been employed.
+(see https://www.chessprogramming.org/Magic_Bitboards#Plain)
+
+- Non-Sliding Pieces (Knights, Pawns, Kings)
+    The occupancy doesn't matter as they will always attack
+    the same squares.
+
+- Sliding Pieces (Queens, Rooks, Bishops)
+    The attacked squares depend on the current
+    board configuration, as an attack ray may be blocked.
+
+
+Brief explanation of how magic bitboards work
+=============================================
+
+Let's consider a bishop as an example.
+There are two goals for a bishop:
+
+1.  Initialize bishop attack tables which contain
+    precalculated bitboards for every possible
+    relevant blocker configuration. The result will
+    be stored in:
+        bishop_attacks[square][magic_index]
+
+2.  Retrieve as fast as possible a bitboard that
+    represents the squares the bishop attacks in a
+    given position. This will be done by accessing
+    the array bishop_attacks[square][magic_number].
+    Since the square will be known, we only need to
+    calculate the magic index.
+
+
+Magic index = (r * m) >> (64 - n)
+
+r:  The blocker configuration in a given
+    position that is relevant for the bishop on a
+    particular square.
+    r = total_occupancy AND bishop_masks[square]
+
+m:  Bishop's magic number for the given square. This
+    is precalculated in bishop_magic_numbers[64]
+
+n:  The number of bits needed to represent indexes.
+
+
+The magic index formula is a hash function
+that will return a number in the range of [0,2^n).
+The efficiency of a magic number is determined by the
+number of constructive collisions. With enough constructive
+collisions, we may reduce n for every square, ideally reducing
+the size of the 2D array. This may result in more CPU cache hits,
+which can improve performance significantly.
+

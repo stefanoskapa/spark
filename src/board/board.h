@@ -1,8 +1,11 @@
 #ifndef BOARD_H
 #define BOARD_H
+#include "../../inc/spark.h"
 
-#define U64 unsigned long long
-
+#define NOT_H 0x7F7F7F7F7F7F7F7FULL
+#define NOT_GH 0x3F3F3F3F3F3F3F3FULL
+#define NOT_A 0xFEFEFEFEFEFEFEFEULL
+#define NOT_AB 0xFCFCFCFCFCFCFCFCULL
 #define NOT_H1 ~(1ULL << h1)
 #define F1 1ULL << f1
 #define NOT_A1 ~(1ULL << a1)
@@ -87,8 +90,8 @@ extern const char ascii_pieces[12];
 extern const int char_pieces[];
 extern const int promoted_pieces[];
 extern const char *square_to_coordinates[];
-extern U64 pos_pieces[12];
-extern U64 pos_occupancies[3];
+extern BB pos_pieces[12];
+extern BB pos_occupancies[3];
 extern int pos_occupancy[64];
 extern int pos_side;
 extern int pos_ep;

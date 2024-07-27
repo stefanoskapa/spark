@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <limits.h>
 #include "board.h"
+#include "../../inc/spark.h"
 #include "../move_encoding/move_encoding.h"
+
 
 static inline void push(int_stack *is, int item);
 static inline int pop(int_stack *is);
@@ -10,8 +12,8 @@ static inline void save_state(void);
 static inline void load_state(void);
 
 // board state
-U64 pos_pieces[12];
-U64 pos_occupancies[3]; // 0 = White, 1 = Black, 2 = Both
+BB pos_pieces[12];
+BB pos_occupancies[3]; // 0 = White, 1 = Black, 2 = Both
 int pos_occupancy[64];
 int pos_side = 1;
 int pos_ep = none;
@@ -71,8 +73,8 @@ void make_move(int move) {
   int const source = GET_MOVE_SOURCE(move);
   int const target = GET_MOVE_TARGET(move);
   int const prom_piece = GET_MOVE_PROMOTION(move);
-  U64 const sourceBB = 1ULL << source;
-  U64 const targetBB = 1ULL << target;
+  BB const sourceBB = 1ULL << source;
+  BB const targetBB = 1ULL << target;
 
   if (pos_side == WHITE) {
 
@@ -80,7 +82,7 @@ void make_move(int move) {
       if (GET_MOVE_EP(move)) {
         pos_cap_piece = p;                        // store captured pawn in pos_cap_piece 
         pos_occupancy[pos_ep + 8] = INT_MAX;      // remove ep-captured pawn from pos_occupancy
-        U64 pawn_kill = ~(1ULL << (pos_ep + 8));  // prepare bitboard that kills the ep-captured pawn
+        BB pawn_kill = ~(1ULL << (pos_ep + 8));  // prepare bitboard that kills the ep-captured pawn
         pos_pieces[p] &= pawn_kill;               // remove ep-captured pawn from pos_pieces
         pos_occupancies[BLACK] &= pawn_kill;      // remove ep-catpured pawn from pos_occupancies[BLACK]
         pos_occupancies[BOTH] &= pawn_kill;       // remove ep-captured pawn from pos_occupancies[BOTH]
@@ -163,7 +165,7 @@ void make_move(int move) {
       if (GET_MOVE_EP(move)) {
         pos_cap_piece = P;
         pos_occupancy[pos_ep - 8] = INT_MAX;
-        U64 pawn_kill = ~(1ULL << (pos_ep - 8));
+        BB pawn_kill = ~(1ULL << (pos_ep - 8));
         pos_pieces[P] &= pawn_kill;
         pos_occupancies[WHITE] &= pawn_kill;
         pos_occupancies[BOTH] &= pawn_kill;
@@ -255,8 +257,8 @@ void takeback(void) {
   int const target = GET_MOVE_TARGET(lmove);
   int const piece = GET_MOVE_PIECE(lmove);
   int const pr_piece = GET_MOVE_PROMOTION(lmove);
-  U64 const sourceBB = 1ULL << source;
-  U64 const targetBB = 1ULL << target;
+  BB const sourceBB = 1ULL << source;
+  BB const targetBB = 1ULL << target;
   
 
   if (pr_piece) {  //handle promotion
@@ -286,7 +288,7 @@ void takeback(void) {
   if (GET_MOVE_CAPTURE(lmove)) { // restore captured piece
     if (GET_MOVE_EP(lmove)) {
       int ep_target = target + (pos_cap_piece == P ? -8 : +8);
-      U64 ep_target_BB = 1ULL << ep_target;
+      BB ep_target_BB = 1ULL << ep_target;
       pos_pieces[pos_cap_piece] |= ep_target_BB; // put ep-captured pawn back
       pos_occupancy[ep_target] = pos_cap_piece;  // same
       pos_occupancies[BOTH] |= ep_target_BB;     // same
