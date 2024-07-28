@@ -1,6 +1,6 @@
 #ifndef ATTACK_TABLES_H
 #define ATTACK_TABLES_H
-
+#include "../Types.h"
 /**
  * @param square current square
  * @param side pawn color

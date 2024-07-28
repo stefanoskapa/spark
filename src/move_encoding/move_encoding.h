@@ -1,7 +1,7 @@
 #ifndef SPARK_MOVE_ENCODING_H
 #define SPARK_MOVE_ENCODING_H
 
-#include <stdint.h>
+#include "../Types.h"
 
 /*
 	MSB                                 LSB
@@ -17,11 +17,7 @@
 	1111 1110 0000 0000 0000 0000 0000 0000   reserved
 */
 
-/**
- * @brief 32-bit move representation
- * Use ENCODE_* and GET_MOVE_* macros to interact.
- */
-#define MOVE uint32_t
+
 
 #define ENC_PIECE 		0xF
 #define ENC_SOURCE		0x3F0
