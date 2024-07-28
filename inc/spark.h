@@ -30,14 +30,37 @@ typedef struct MoveList {
  */
 void init_attack_tables(void);
 
-
+/** @brief Initializes board with FEN position
+ *
+ * @param fen_string String containg FEN notation
+ *
+ */
 void parse_fen(char *fen_string);
 
+/** @brief Generates all legal moves for the current position
+ *
+ * @returns MoveList containing all legal moves
+ *
+ */
 MoveList generate_moves(void);
 
+/**
+ *
+ * @returns A string with the UCI move notation
+ *
+ */
 char *get_move_UCI(MOVE move);
 
-void make_move(int move);
+/**
+ * @brief Makes a move on the global board.
+ *
+ */
+void make_move(MOVE move);
+
+/**
+ * @brief Takes back the last move on the global board.
+ *
+ */
 void takeback(void);
 
 #define ENCODE_MOVE(piece, source, target, prom_piece, capture, double_push, ep, castling) \
