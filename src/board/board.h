@@ -1,6 +1,11 @@
 #ifndef BOARD_H
 #define BOARD_H
-#include "../../inc/spark.h"
+#include "../move_encoding/move_encoding.h"
+
+/**
+ * @brief A 64-bit bitboard
+ */
+#define BB uint64_t
 
 #define NOT_H 0x7F7F7F7F7F7F7F7FULL
 #define NOT_GH 0x3F3F3F3F3F3F3F3FULL
@@ -54,11 +59,14 @@ typedef struct {
   int index;
 } int_stack;
 
-typedef struct {
-  int moves[256];
+/**
+ * @brief Struct for storing the generator results
+ */
+typedef struct MoveList {
+  MOVE moves[256];
   int current_index;
   int capture_count;
-} moves;
+} MoveList;
 
 enum {
   a8,b8,c8,d8,e8,f8,g8,h8,

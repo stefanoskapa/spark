@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <limits.h>
 #include "board.h"
-#include "../../inc/spark.h"
 #include "../move_encoding/move_encoding.h"
 
 

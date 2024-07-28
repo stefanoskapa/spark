@@ -7,6 +7,12 @@
  */
 #define BB uint64_t
 
+/**
+ * @brief 32-bit move representation
+ * Use ENCODE_* and GET_MOVE_* macros to interact.
+ */
+#define MOVE uint32_t
+
 
 /** @brief Initializes attack tables for all pieces
  *

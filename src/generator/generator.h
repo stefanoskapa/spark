@@ -2,6 +2,6 @@
 #define SPARK_GENERATOR_H
 #include "../board/board.h"
 
-moves generate_moves(void);
-extern moves list;
+MoveList generate_moves(void);
+extern MoveList list;
 #endif

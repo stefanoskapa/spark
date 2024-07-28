@@ -1,4 +1,3 @@
-#include "../../inc/spark.h"
 #include "../board/board.h"
 #include "attack_tables.h"
 
