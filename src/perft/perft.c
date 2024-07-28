@@ -1,21 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../attack_tables/attack_tables.h"
 #include "../board_utils/board_utils.h"
 #include "../board/board.h"
 #include "../generator/generator.h"
 #include "../move_encoding/move_encoding.h"
 #include "perft.h"
 
-U64 perft_captures = 0;
-U64 perft_eps = 0;
-U64 perft_castles = 0;
-U64 perft_promotions = 0;
+BB perft_captures = 0;
+BB perft_eps = 0;
+BB perft_castles = 0;
+BB perft_promotions = 0;
 struct perf_test {
   char title[20];
   char pos[256];
-  U64 nodes[20];
+  BB nodes[20];
   int d_count;
 };
 
@@ -85,20 +84,19 @@ void perft_suite(int max_depth) {
       if (perft(j + 1) != pos_list[i].nodes[j]) {
         printf("failed :(\n");
         exit(1);
-      } else {
-        printf("success :)\n");
+      }
+      printf("success :)\n");
       }
     }
-  }
 
   printf("\nAll tests passed!\n");
 }
 
 void run_perft(int depth) {
 
-  U64 nodes;
+  BB nodes;
   clock_t start, end;
-  U64 time_used;
+  BB time_used;
 
   for (int i = 1; i <= depth; i++) {
 
@@ -114,43 +112,40 @@ void run_perft(int depth) {
 
     printf("\nDepth %d\n", i);
     printf("=================\n");
-    printf("Total moves: %llu\n", nodes);
-    printf("Captures: %llu\n", perft_captures);
-    printf("Eps: %llu\n", perft_eps);
-    printf("Castles: %llu\n", perft_castles);
-    printf("Promotions: %llu\n", perft_promotions);
-    printf("Time taken: %llu ms\n", time_used);
+    printf("Total moves: %lu\n", nodes);
+    printf("Captures: %lu\n", perft_captures);
+    printf("Eps: %lu\n", perft_eps);
+    printf("Castles: %lu\n", perft_castles);
+    printf("Promotions: %lu\n", perft_promotions);
+    printf("Time taken: %lu ms\n", time_used);
   }
 }
 
-void divide(int depth) {
+void divide(int const depth) {
 
-  U64 nodes = 0;
-
-  moves move_list = generate_moves();
+  moves const move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 
-    nodes = 0;
+    BB nodes = 0;
     //print_move_UCI(move_list.moves[i]);
     printf("%s: ",get_move_UCI(move_list.moves[i]));
     fflush(stdout);
     make_move(move_list.moves[i]);
     nodes += perft(depth - 1);
     takeback();
-    printf("%llu\n", nodes);
+    printf("%lu\n", nodes);
   }
 }
 
-U64 perft(int depth) {
+BB perft(int const depth) {
 
-  //moves move_list = {{0}, 0};
-  U64 nodes = 0;
+  BB nodes = 0;
 
   if (depth == 0)
     return 1ULL;
 
-  moves move_list = generate_moves();
+  moves const move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 

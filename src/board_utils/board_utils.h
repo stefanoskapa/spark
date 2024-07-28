@@ -7,4 +7,4 @@ void show_board(void);
 void fen_error(void);
 void parse_fen(char *fen_string);
 void clean_board(void);
-#endif //SPARK_BOARD_UTILS_H
+#endif

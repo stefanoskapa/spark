@@ -6,9 +6,9 @@
 #include "../move_encoding/move_encoding.h"
 #include "generator.h"
 
-static inline void add_prio(moves *mlist, int move);
-static inline void sort_caps(moves *mlist);
-static inline void add_move(moves *mlist, int move);
+static void add_prio(moves *mlist, int move);
+static void sort_caps(moves *mlist);
+static void add_move(moves *mlist, int move);
 
 int nextCapIndex = 0;
 static const int piece_values[] = {
@@ -35,7 +35,7 @@ static inline void add_move(moves *mlist, int move) {
 
   //precheck
   if (piece != K && piece != k && !GET_MOVE_EP(move)) {
-    const U64 sourceBB = 1ULL << GET_MOVE_SOURCE(move);
+    const BB sourceBB = 1ULL << GET_MOVE_SOURCE(move);
     pos_pieces[piece] &= ~(sourceBB);
     pos_occupancies[2] &= ~(sourceBB);
     int isInCheck = IS_KING_IN_CHECK(pos_side);
@@ -129,11 +129,11 @@ moves generate_moves(void) {
   glist.capture_count = 0;
   nextCapIndex = 0;
   int source, target;
-  U64 bitboard, attacks;
+  BB bitboard, attacks;
   int const min = pos_side ? p : P;
   int const max = min + 5;
-  U64 const my_neg_occ = ~pos_occupancies[pos_side]; //my negative occupancy
-  U64 const his_occ = pos_occupancies[!pos_side];
+  BB const my_neg_occ = ~pos_occupancies[pos_side]; //my negative occupancy
+  BB const his_occ = pos_occupancies[!pos_side];
 
   for (int piece = min; piece <= max; piece++) {
 
@@ -162,7 +162,7 @@ moves generate_moves(void) {
           }
 
           // captures
-          attacks = pawn_attacks[pos_side][source];
+          attacks = get_pawn_attacks(source,pos_side);
 
           if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
             add_move(&glist, ENCODE_EP(P, source, pos_ep));
@@ -190,7 +190,7 @@ moves generate_moves(void) {
       case n:
         while (bitboard) {
           source = FIRST_SET_BIT(bitboard);
-          attacks = knight_attacks[source] & my_neg_occ; // don't capture own pieces
+          attacks = get_knight_attacks(source) & my_neg_occ; // don't capture own pieces
 
           while (attacks) { // loop over target squares
             target = FIRST_SET_BIT(attacks);
@@ -287,7 +287,7 @@ moves generate_moves(void) {
         }
 
         source = FIRST_SET_BIT(bitboard);
-        attacks = king_attacks[source] & (~pos_occupancies[WHITE]);
+        attacks = get_king_attacks(source) & (~pos_occupancies[WHITE]);
         while (attacks) { // loop over target squares
           target = FIRST_SET_BIT(attacks);
 
@@ -321,7 +321,7 @@ moves generate_moves(void) {
           }
 
           // captures
-          attacks = pawn_attacks[pos_side][source];
+          attacks = get_pawn_attacks(source, pos_side);
 
           if ((pos_ep != none) && (attacks & (1ULL << pos_ep))) { // en passant
             add_move(&glist, ENCODE_EP(p, source, pos_ep));
@@ -368,7 +368,7 @@ moves generate_moves(void) {
         }
 
         source = FIRST_SET_BIT(bitboard);
-        attacks = king_attacks[source] & (~pos_occupancies[BLACK]);
+        attacks = get_king_attacks(source) & (~pos_occupancies[BLACK]);
         while (attacks) { // loop over target squares
           target = FIRST_SET_BIT(attacks);
 
