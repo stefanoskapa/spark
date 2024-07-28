@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../board_utils/board_utils.h"
-#include "../board/board.h"
-#include "../generator/generator.h"
-#include "../move_encoding/move_encoding.h"
+#include "../../inc/spark.h"
 #include "perft.h"
 
 BB perft_captures = 0;
@@ -123,7 +120,7 @@ void run_perft(int depth) {
 
 void divide(int const depth) {
 
-  moves const move_list = generate_moves();
+  MoveList const move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 
@@ -145,7 +142,7 @@ BB perft(int const depth) {
   if (depth == 0)
     return 1ULL;
 
-  moves const move_list = generate_moves();
+  MoveList const move_list = generate_moves();
 
   for (int i = 0; i < move_list.current_index; i++) {
 

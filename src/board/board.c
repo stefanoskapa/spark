@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <limits.h>
 #include "board.h"
-#include "../../inc/spark.h"
 #include "../move_encoding/move_encoding.h"
 
 
@@ -65,7 +64,7 @@ const char *square_to_coordinates[] = {
   "e3", "f3", "g3", "h3", "a2", "b2", "c2", "d2", "e2", "f2", "g2",
   "h2", "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"};
 
-void make_move(int move) {
+void make_move(MOVE const move) {
 
   save_state(); //save irreversibe aspects of the position, since they are about to be modified 
 

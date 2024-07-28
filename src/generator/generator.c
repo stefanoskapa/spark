@@ -6,9 +6,9 @@
 #include "../move_encoding/move_encoding.h"
 #include "generator.h"
 
-static void add_prio(moves *mlist, int move);
-static void sort_caps(moves *mlist);
-static void add_move(moves *mlist, int move);
+static void add_prio(MoveList *mlist, MOVE move);
+static void sort_caps(MoveList *mlist);
+static void add_move(MoveList *mlist, MOVE move);
 
 int nextCapIndex = 0;
 static const int piece_values[] = {
@@ -28,7 +28,7 @@ static const int piece_values[] = {
  * This is to avoid make/unmake whenever possible, as those
  * are expensive operations.
  */
-static inline void add_move(moves *mlist, int move) {
+static void add_move(MoveList *mlist, MOVE const move) {
 
  
   int piece = GET_MOVE_PIECE(move);
@@ -61,11 +61,11 @@ if (!IS_KING_IN_CHECK((!pos_side))) { //legal move
   takeback();
 }
 
-static inline void add_prio(moves *mlist, int move) {
+static void add_prio(MoveList *mlist, MOVE move) {
 
   if (GET_MOVE_CAPTURE(move) || GET_MOVE_PROMOTION(move)) {
     if (nextCapIndex < mlist->current_index) {
-      int temp = mlist->moves[nextCapIndex];
+      MOVE const temp = mlist->moves[nextCapIndex];
       mlist->moves[nextCapIndex] = move;
       move = temp; 
     }
@@ -76,7 +76,7 @@ static inline void add_prio(moves *mlist, int move) {
 }
 
 //MVV - LVA
-static inline void sort_caps(moves *mlist) { 
+static void sort_caps(MoveList *mlist) {
 
 
   for (int i = 0; i < nextCapIndex; i++) {
@@ -84,7 +84,7 @@ static inline void sort_caps(moves *mlist) {
     int max = INT_MIN;
 
     for (int j = i; j < nextCapIndex; j++) { 
-      int move = mlist->moves[j];
+      MOVE const move = mlist->moves[j];
       int profit;
       if (GET_MOVE_EP(move))
         profit = 0;
@@ -114,7 +114,7 @@ static inline void sort_caps(moves *mlist) {
         best_index = j;
       }
     }
-    int temp = mlist->moves[i];
+    MOVE const temp = mlist->moves[i];
     mlist->moves[i] = mlist->moves[best_index];
     mlist->moves[best_index] = temp;
   }
@@ -123,8 +123,8 @@ static inline void sort_caps(moves *mlist) {
 
 
 
-moves generate_moves(void) {
-  moves glist;
+MoveList generate_moves(void) {
+  MoveList glist;
   glist.current_index = 0;
   glist.capture_count = 0;
   nextCapIndex = 0;

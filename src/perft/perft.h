@@ -1,7 +1,6 @@
 #ifndef PERFT_H
 #define PERFT_H
-
-#include "../../inc/spark.h"
+#include "../Types.h"
 
 void divide(int depth);
 void run_perft(int depth);
