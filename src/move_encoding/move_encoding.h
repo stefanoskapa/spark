@@ -2,8 +2,6 @@
 #define SPARK_MOVE_ENCODING_H
 
 #include <stdint.h>
-#include "../board/board.h"
-
 
 /*
 	MSB                                 LSB

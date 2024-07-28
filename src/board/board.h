@@ -1,11 +1,14 @@
 #ifndef BOARD_H
 #define BOARD_H
-#include "../move_encoding/move_encoding.h"
+
+#include <stdint.h>
 
 /**
  * @brief A 64-bit bitboard
  */
 #define BB uint64_t
+
+#define MOVE uint32_t
 
 #define NOT_H 0x7F7F7F7F7F7F7F7FULL
 #define NOT_GH 0x3F3F3F3F3F3F3F3FULL
