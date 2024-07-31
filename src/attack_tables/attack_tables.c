@@ -349,7 +349,7 @@ has 2^n occupancy variations.
 The number of set bits in index determine which of the
 set bits in attack mask will be present in the result.
 */
-BB get_occupancy_variation(int const index, BB attack_mask) {
+static BB get_occupancy_variation(int const index, BB attack_mask) {
 
     int const bit_count = POPCNT(attack_mask);
     BB occupancy = 0ULL;

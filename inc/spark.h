@@ -129,5 +129,16 @@ void takeback(void);
 #define SET_MOVE_CHECK(move)         ((move | 0x1000000))
 
 
+extern const char ascii_pieces[12];
+extern const int char_pieces[];
+extern const int promoted_pieces[];
+extern const char *square_to_coordinates[];
+extern BB pos_pieces[12];
+extern BB pos_occupancies[3];
+extern int pos_occupancy[64];
+extern int pos_side;
+extern int pos_ep;
+extern int pos_castling;
+extern int pos_cap_piece;
 
 #endif
