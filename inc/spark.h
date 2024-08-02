@@ -167,7 +167,13 @@ enum {
 enum { P, N, B, R, Q, K, p, n, b, r, q, k };
 
 
-BB get_bishop_attacks(int square, BB total_occupancy);
+/**
+ * @param square current square
+ * @param side pawn color
+ *
+ * @returns Bitboard representing the pawn's attacks
+ */
+BB get_pawn_attacks(int square, int side);
 
 /**
  * @param square current square
@@ -175,4 +181,48 @@ BB get_bishop_attacks(int square, BB total_occupancy);
  * @returns Bitboard representing the knights's attacks
  */
 BB get_knight_attacks(int square);
+
+/**
+ * @param square current square
+ * @param total_occupancy Bitboard of total board occupancy
+ *
+ * @returns Bitboard representing the bishop's attacks
+ */
+BB get_bishop_attacks(int square, BB total_occupancy);
+
+/**
+ * @param square current square
+ * @param total_occupancy Bitboard of total board occupancy
+ *
+ * @returns Bitboard representing the rook's attacks
+ */
+BB get_rook_attacks(int square, BB total_occupancy);
+
+/**
+ * @param square current square
+ * @param total_occupancy Bitboard of total board occupancy
+ *
+ * @returns Bitboard representing the queens's attacks
+ */
+BB get_queen_attacks(int square, BB total_occupancy);
+
+/**
+ * @param square current square
+ *
+ * @returns Bitboard representing the kings's attacks
+ */
+BB get_king_attacks(int square);
+
+
+
+void show_occ_board(void);
+int is_square_attacked(int square, int side);
+void show_board(void);
+void fen_error(void);
+void parse_fen(char *fen_string);
+void clean_board(void);
+
+
+#define IS_KING_IN_CHECK(side) is_square_attacked(FIRST_SET_BIT(pos_pieces[side == WHITE ? K : k]), !side)
+
 #endif
