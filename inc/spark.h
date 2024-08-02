@@ -128,6 +128,16 @@ void takeback(void);
 
 #define SET_MOVE_CHECK(move)         ((move | 0x1000000))
 
+#define IS_SET(bitboard, square) bitboard & (1ULL << square)
+#define SET_BIT(bitboard, bit_nr) bitboard |= (1ULL << bit_nr)
+#define CLEAR_BIT(bitboard, bit_nr) bitboard &= ~(1ULL << bit_nr)
+#define POPCNT(x) __builtin_popcountll(x)
+#define FIRST_SET_BIT(x) __builtin_ctzll(x)
+
+#define WHITE 0
+#define BLACK 1
+#define BOTH 2
+
 
 extern const char ascii_pieces[12];
 extern const int char_pieces[];
@@ -156,4 +166,13 @@ enum {
 
 enum { P, N, B, R, Q, K, p, n, b, r, q, k };
 
+
+BB get_bishop_attacks(int square, BB total_occupancy);
+
+/**
+ * @param square current square
+ *
+ * @returns Bitboard representing the knights's attacks
+ */
+BB get_knight_attacks(int square);
 #endif
