@@ -362,10 +362,3 @@ static int pop(int_stack *is) {
   return is->items[is->index];
 }
 
-void show_stack(int_stack *is) {
-
-  printf("Stack contents\n");
-  for (int i = 0; i < is->index; i++) {
-    printf("%d\n", is->items[i]);
-  }
-}
