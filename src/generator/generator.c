@@ -91,23 +91,7 @@ static void sort_caps(MoveList *mlist) {
       else if (GET_MOVE_PROMOTION(move))
         profit = piece_values[GET_MOVE_PROMOTION(move)];
       else { 
-/*
-        show_occ_board();
-        printf("[ SORTING MOVE ]\n");
-        printf("moves that lead to this position:\n");
-
-        for (int i = 0; i < pos_moves.index; i ++) {
-          print_move_UCI(pos_moves.items[i]);
-        }
-        print_move(move);
-        printf("captured piece: %d\n", pos_occupancy[GET_MOVE_TARGET(move)]);      
-        printf("capturer: %d\n", GET_MOVE_PIECE(move));
-        PRINT_BB(pos_occupancies[0]);
-        PRINT_BB(pos_occupancies[1]);
-        PRINT_BB(pos_occupancies[2]);
-        */
         profit = piece_values[pos_occupancy[GET_MOVE_TARGET(move)]] - piece_values[GET_MOVE_PIECE(move)];
-      
       }
       if (profit > max) {
         max = profit;

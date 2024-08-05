@@ -1,6 +1,7 @@
 #ifndef SPARK_H
 #define SPARK_H
 #include <stdint.h>
+#include <stdbool.h>
 
 /**
  * @brief A 64-bit bitboard
@@ -73,49 +74,6 @@ void takeback(void);
 (ep << 22) 					|\
 (castling << 23)
 
-#define ENCODE_EP(piece, source, target) \
-(piece) 					  |\
-(source << 4) 		  |\
-(target << 10) 		  |\
-(1ULL << 20)        |\
-(1ULL << 22)
-
-#define ENCODE_PROM(piece, source, target, prom_piece) \
-(piece) 					  |\
-(source << 4) 		  |\
-(target << 10) 		  |\
-(prom_piece << 16)
-
-#define ENCODE_DOUBLE(piece, source, target) \
-(piece) 					  |\
-(source << 4) 		  |\
-(target << 10) 		  |\
-(1ULL << 21)
-
-#define ENCODE_SIMPLE_MOVE(piece, source, target) \
-(piece) 					  |\
-(source << 4) 		  |\
-(target << 10)
-
-#define ENCODE_SIMPLE_CAPTURE(piece, source, target) \
-(piece) 					  |\
-(source << 4) 		  |\
-(target << 10) 		  |\
-(1ULL << 20)
-
-#define ENCODE_CASTLING(piece, source, target) \
-(piece) 					  |\
-(source << 4) 		  |\
-(target << 10) 		  |\
-(1ULL << 23)
-
-#define ENCODE_CAP_PROM(piece, source, target, prom_piece) \
-(piece) 					  |\
-(source << 4) 		  |\
-(target << 10) 		  |\
-(prom_piece << 16)  |\
-(1ULL << 20)
-
 #define GET_MOVE_PIECE(move)         ((move & 0xF )    >> 0)
 #define GET_MOVE_SOURCE(move)        ((move & 0x3F0)    >> 4)
 #define GET_MOVE_TARGET(move)        ((move & 0xFC00)    >> 10)
@@ -125,8 +83,6 @@ void takeback(void);
 #define GET_MOVE_EP(move)            ((move & 0x400000))
 #define GET_MOVE_CASTLING(move)      ((move & 0x800000))
 #define GET_MOVE_CHECK(move)         ((move & 0x1000000))
-
-#define SET_MOVE_CHECK(move)         ((move | 0x1000000))
 
 #define IS_SET(bitboard, square) bitboard & (1ULL << square)
 #define SET_BIT(bitboard, bit_nr) bitboard |= (1ULL << bit_nr)
@@ -138,11 +94,14 @@ void takeback(void);
 #define BLACK 1
 #define BOTH 2
 
-
+//Helpers
 extern const char ascii_pieces[12];
 extern const int char_pieces[];
 extern const int promoted_pieces[];
 extern const char *square_to_coordinates[];
+
+
+// Global State
 extern BB pos_pieces[12];
 extern BB pos_occupancies[3];
 extern int pos_occupancy[64];
@@ -213,14 +172,18 @@ BB get_queen_attacks(int square, BB total_occupancy);
  */
 BB get_king_attacks(int square);
 
+/**
+ * @param square The square to check
+ * @param side The attacking side
+ * @returns True if the square is attacked, otherwise false
+ */
+bool is_square_attacked(int square, int side);
 
-
-void show_occ_board(void);
-int is_square_attacked(int square, int side);
-void show_board(void);
-void fen_error(void);
+/**
+ * @param fen_string A chess position in FEN notation 
+ * Sets up a board position on the global board
+ */
 void parse_fen(char *fen_string);
-void clean_board(void);
 
 
 #define IS_KING_IN_CHECK(side) is_square_attacked(FIRST_SET_BIT(pos_pieces[side == WHITE ? K : k]), !side)

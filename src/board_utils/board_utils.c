@@ -7,7 +7,7 @@
 #include "board_utils.h"
 
 
-int is_square_attacked(int const square, int const side) { // attacking side
+bool is_square_attacked(int const square, int const side) { // attacking side
 
   if (side == WHITE) {
     return      
@@ -27,64 +27,12 @@ int is_square_attacked(int const square, int const side) { // attacking side
 
 }
 
-void show_board(void) {
-  for (int square = 0; square < 64; square++) {
-    if (square % 8 == 0)
-      printf("\n");
-    char char_to_show = '.';
-    for (int piece = 0; piece < 12; piece++) {
-      if (IS_SET(pos_pieces[piece], square)) {
-        char_to_show = ascii_pieces[piece];
-        break;
-      }
-    }
-    printf(" %c ", char_to_show);
-  }
-
-  printf("\n\nside:        ");
-  if (pos_side == WHITE)
-    printf("white");
-  else if (pos_side == BLACK)
-    printf("black");
-  printf("\n");
-
-  printf("castling:    ");
-  if (pos_castling & wk) printf("K");
-  if (pos_castling & wq) printf("Q");
-  if (pos_castling & bk) printf("k");
-  if (pos_castling & bq) printf("q");
-  printf("\n");
-
-  unsigned char file = pos_ep == none ? '-' : pos_ep % 8 + 'a';
-  unsigned char rank = pos_ep == none ? ' ' : '8' - pos_ep / 8;
-  printf("en passant:  %c%c\n", file, rank);
-
-
-}
-
-
-void show_occ_board(void) {
-  for (int square = 0; square < 64; square++) {
-    if (square % 8 == 0)
-      printf("\n");
-    char char_to_show = '.';
-    if (pos_occupancy[square] != INT_MAX) {
-      char_to_show = ascii_pieces[pos_occupancy[square]];
-    }
-
-    printf(" %c ", char_to_show);
-  }
-
-}
-
-
-
-void fen_error(void) {
+static void fen_error(void) {
   printf("Invalid FEN string\n");
   exit(1);
 }
 
-void clean_board(void) {
+static void clean_board(void) {
   for (size_t i = 0; i < sizeof(pos_pieces)/sizeof(pos_pieces[0]); i++)
     pos_pieces[i]=0ULL;
 
@@ -100,6 +48,7 @@ void clean_board(void) {
   pos_cap_piece = 0;
 
 }
+
 void parse_fen(char *fen_string) {
   if (strlen(fen_string) < 24 || strlen(fen_string) > 80)
     fen_error();
